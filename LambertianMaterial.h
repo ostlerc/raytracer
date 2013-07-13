@@ -18,8 +18,9 @@ class LambertianMaterial : public Material {
   LambertianMaterial& operator=(const LambertianMaterial&);
 
   Color color;
-  float Kd;
-  float Ka;
+  float Kd; //diffuse
+  float Ka; //ambient
+  //float Ks; //specular
 };
 
 #endif
