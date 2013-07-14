@@ -3,20 +3,27 @@
 
 #include "Primitive.h"
 #include "Point.h"
+#include "Animation.h"
+
 class Ray;
 
 class Triangle : public Primitive {
     public:
-        Triangle(Material* material, const Point& p0, const Point& p1, const Point& p2, const Vector& n);
+        Triangle(Material* material,
+                Animation<Point>& p0,
+                Animation<Point>& p1,
+                Animation<Point>& p2,
+                Animation<Vector>& n);
         virtual ~Triangle();
 
         virtual void getBounds(BoundingBox& bbox, const RenderContext&) const;
         virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const;
         virtual void normal(Vector& normal, const RenderContext& context,
                 const Point& hitpos, const Ray& ray, const HitRecord& hit) const;
+        virtual void preprocess(double maxTime);
     protected:
-        Point p0, p1, p2;
-        Vector n;
+        Animation<Point> p0, p1, p2;
+        Animation<Vector> n;
 };
 
 #endif //Triangle_h

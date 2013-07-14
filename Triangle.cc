@@ -1,48 +1,67 @@
 #include "Triangle.h"
 #include "BoundingBox.h"
 #include "HitRecord.h"
+#include "RenderContext.h"
 #include "Point.h"
 #include "Ray.h"
 #include "Vector.h"
 #include <math.h>
 #include <iostream>
 
-Triangle::Triangle(Material* material, const Point& p0, const Point& p1,
-        const Point& p2, const Vector& normal)
+Triangle::Triangle(Material* material, Animation<Point>& p0, Animation<Point>& p1,
+        Animation<Point>& p2, Animation<Vector>& normal)
     : Primitive(material)
     , p0(p0)
     , p1(p1)
     , p2(p2)
     , n(normal)
 {
-    if(n.isNull()) //calculate a normal since none was given
-        n = Cross(p1-p0,p2-p0);
-
-    n.normalize();
 }
 
 Triangle::~Triangle()
 {
 }
 
-void Triangle::getBounds(BoundingBox& bbox, const RenderContext&) const
+void Triangle::preprocess(double maxTime)
 {
-    bbox.extend(p0);
-    bbox.extend(p1);
-    bbox.extend(p2);
+    p0.preprocess(maxTime);
+    p1.preprocess(maxTime);
+    p2.preprocess(maxTime);
+    if(n.isEmpty()) //calculate a normal since none was given
+    {
+        for(int i = 0; i <= maxTime; i++)
+        {
+            Vector _n(Cross(p1(i)-p0(i),p2(i)-p0(i)));
+            _n.normalize();
+            n.addFrame(i, _n);
+        }
+    }
+    n.preprocess(maxTime);
 }
 
-void Triangle::intersect(HitRecord& hit, const RenderContext&, const Ray& ray) const
+void Triangle::getBounds(BoundingBox& bbox, const RenderContext& context) const
 {
+    bbox.extend(p0(context.time()));
+    bbox.extend(p1(context.time()));
+    bbox.extend(p2(context.time()));
+}
+
+void Triangle::intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const
+{
+    double time = context.time();
+    const Point& _p0 = p0(time);
+    const Point& _p1 = p1(time);
+    const Point& _p2 = p2(time);
+    const Vector& _n = n(time);
     //check plane intersection first first
-    double denom = Dot(n, ray.direction());
+    double denom = Dot(_n, ray.direction());
     if(Abs(denom) <= 1.e-6)
         return;
 
     Vector e1, e2, h, s, q;
     double a, f, u, v;
-    e1 = p1 - p0;
-    e2 = p2 - p0;
+    e1 = _p1 - _p0;
+    e2 = _p2 - _p0;
 
     h = Cross(ray.direction(), e2);
     a = Dot(e1, h);
@@ -51,7 +70,7 @@ void Triangle::intersect(HitRecord& hit, const RenderContext&, const Ray& ray) c
         return;
 
     f = 1.0/a;
-    s = ray.origin() - p0;
+    s = ray.origin() - _p0;
     u = f * Dot(s,h);
 
     if (u < 0.0 || u > 1.0)
@@ -74,8 +93,8 @@ void Triangle::intersect(HitRecord& hit, const RenderContext&, const Ray& ray) c
     // but not a ray intersection
 }
 
-void Triangle::normal(Vector& normal, const RenderContext&, const Point& hitpos,
+void Triangle::normal(Vector& normal, const RenderContext& context, const Point& hitpos,
         const Ray& ray, const HitRecord& hit) const
 {
-    normal = n;
+    normal = n(context.time());
 }

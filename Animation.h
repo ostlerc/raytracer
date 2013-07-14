@@ -14,6 +14,7 @@ public:
     }
     Animation(ValueType val)
         :map()
+         ,values()
     {
         map.push_back(entry(0,val));
     }
@@ -51,7 +52,8 @@ public:
         return a.value * (1-weight) + b.value * weight;
     }
 
-    bool isEmpty() { return map.empty(); }
+    bool isEmpty() const { return map.empty(); }
+    bool isEmpty2() const { return values.empty(); }
 
 private:
     struct entry

@@ -544,14 +544,12 @@ Object *Parser::parseSphereObject()
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `material', `center', `radius' or }." );
+                throwParseException( "Expected `material', `center', `radius', `time' or }." );
         }
     }
 
-    if(center.isEmpty())
-        center.addFrame(0, Point(0.0, 0.0, 0.0));
-    if(radius.isEmpty())
-        radius.addFrame(0, 0.5);
+    if(center.isEmpty() || radius.isEmpty())
+        throwParseException( "Expected `material', `center', `radius' or }." );
 
     return new Sphere( material, center, radius );
 }
@@ -559,10 +557,12 @@ Object *Parser::parseSphereObject()
 Object *Parser::parseTriangleObject()
 {
     Material *material = default_material;
-    Point p1( 0.0, 0.0, 0.0 );
-    Point p2( 0.0, 0.0, 0.0 );
-    Point p3( 0.0, 0.0, 0.0 );
-    Vector normal( 0.0, 0.0, 0.0 );
+
+    int time = 0;
+    Animation<Point> p1;
+    Animation<Point> p2;
+    Animation<Point> p3;
+    Animation<Vector> normal;
 
     if ( peek( Token::left_brace ) )
     {
@@ -571,19 +571,28 @@ Object *Parser::parseTriangleObject()
             if ( peek( "material" ) )
                 material = parseMaterial();
             else if ( peek( "p1" ) )
-                p1 = parsePoint();
+                p1.addFrame((double)time, parsePoint());
             else if ( peek( "p2" ) )
-                p2 = parsePoint();
+                p2.addFrame((double)time, parsePoint());
             else if ( peek( "p3" ) )
-                p3 = parsePoint();
+                p3.addFrame((double)time, parsePoint());
             else if ( peek( "normal" ) )
-                normal = parseVector();
+            {
+                Vector n(parseVector());
+                n.normalize();
+                normal.addFrame((double)time, n);
+            }
+            else if ( peek( "time" ) )
+                time = parseInteger();
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `material', `p1', `p2', `p3', `normal' or }." );
+                throwParseException( "Expected `material', `p1', `p2', `p3', `normal' `time' or }." );
         }
     }
+
+    if(p1.isEmpty() || p2.isEmpty() || p3.isEmpty())
+        throwParseException( "'triangle' is missing one or more of its vertices");
 
     return new Triangle( material, p1, p2, p3, normal );
 }

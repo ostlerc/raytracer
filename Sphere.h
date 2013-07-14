@@ -9,7 +9,9 @@ class Ray;
 
 class Sphere : public Primitive {
  public:
-  Sphere(Material* material, Animation<Point>& center, Animation<double> radius);
+  Sphere(Material* material,
+          Animation<Point>& center,
+          Animation<double> radius);
   virtual ~Sphere();
 
   virtual void getBounds(BoundingBox& bbox, const RenderContext&) const;
