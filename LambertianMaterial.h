@@ -1,4 +1,3 @@
-
 #ifndef LambertianMaterial_h
 #define LambertianMaterial_h
 
@@ -20,7 +19,6 @@ class LambertianMaterial : public Material {
   Color color;
   float Kd; //diffuse
   float Ka; //ambient
-  //float Ks; //specular
 };
 
 #endif

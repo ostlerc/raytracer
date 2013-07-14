@@ -10,7 +10,7 @@ class PinholeCamera : public Camera {
  public:
   PinholeCamera(const Point& eye, const Point& lookat, const Vector& up, double hfov);
   virtual ~PinholeCamera();
-  
+
   virtual void preprocess(double aspect_ratio);
   virtual void makeRay(Ray& ray, const RenderContext& context, double x, double y) const;
 

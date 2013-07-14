@@ -74,11 +74,13 @@ class Parser {
   Light *parseLight();
 
   Material *parseLambertianMaterial();
+  Material *parseSpecularMaterial();
   Material *parseMaterial();
 
   Object *parseGroupObject();
   Object *parsePlaneObject();
   Object *parseSphereObject();
+  Object *parseTriangleObject();
   Object *parseObject();
 
   public:
@@ -88,6 +90,11 @@ class Parser {
 
   Scene *parseScene(
     std::string &filename );
+
+  int maxTime() const { return max_time; }
+
+  private:
+    int max_time;
 
 };
 

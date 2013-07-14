@@ -49,10 +49,12 @@ class Point {
   Point operator+(const Vector& v) const {
     return Point(data[0]+v.x(), data[1]+v.y(), data[2]+v.z());
   }
+  Point operator+(const Point& p) const {
+      return Point(data[0]+p.data[0], data[1]+p.data[1], data[2]+p.data[2]);
+  }
   Point operator-(const Vector& v) const {
     return Point(data[0]-v.x(), data[1]-v.y(), data[2]-v.z());
   }
-
   Point& operator+=(const Vector& v) {
     data[0]+=v.x();
     data[1]+=v.y();
@@ -65,6 +67,18 @@ class Point {
     data[1]-=v.y();
     data[2]-=v.z();
     return *this;
+  }
+  Point& operator*(double v) {
+      data[0]*=v;
+      data[1]*=v;
+      data[2]*=v;
+      return *this;
+  }
+  Point& operator*(const Point& v) {
+      data[0]*=v.x();
+      data[1]*=v.y();
+      data[2]*=v.z();
+      return *this;
   }
  private:
   double data[3];

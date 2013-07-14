@@ -1,4 +1,3 @@
-
 #include "LambertianMaterial.h"
 #include "HitRecord.h"
 #include "Light.h"

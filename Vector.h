@@ -28,6 +28,12 @@ class Vector {
     return *this;
   }
 
+  bool isNull() {
+      return data[0] == 0.0 &&
+             data[1] == 0.0 &&
+             data[2] == 0.0;
+  }
+
   ~Vector() {
   }
 
@@ -145,6 +151,11 @@ inline Vector Cross(const Vector& v1, const Vector& v2)
   return Vector(v1.y()*v2.z() - v1.z()*v2.y(),
                 v1.z()*v2.x() - v1.x()*v2.z(),
                 v1.x()*v2.y() - v1.y()*v2.x());
+}
+
+inline double Clamp(double v, double min, double max)
+{
+    return v > max ? max : (v < min ? min : v);
 }
 
 inline Vector Min(const Vector& p1, const Vector& p2)

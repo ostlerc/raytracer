@@ -34,24 +34,10 @@ class HitRecord {
   const Material* getMaterial() const {
     return matl;
   }
-  template< typename T >
-    T* getScratchpad()
-  {
-    char unnamed[ ( sizeof( T ) <= sizeof( scratchdata ) ) ? 1 : 0 ];
-    return reinterpret_cast< T * >( scratchdata );
-  }
-  template< typename T >
-    const T* getScratchpad() const
-  {
-    char unnamed[ ( sizeof( T ) <= sizeof( scratchdata ) ) ? 1 : 0 ];
-    return reinterpret_cast< const T * >( scratchdata );
-  }
  private:
   const Primitive* prim;
   const Material* matl;
   double min;
-
-  char scratchdata[128];
 };
 
 #endif

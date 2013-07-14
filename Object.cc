@@ -9,6 +9,6 @@ Object::~Object()
 {
 }
 
-void Object::preprocess()
+void Object::preprocess(double)
 {
 }

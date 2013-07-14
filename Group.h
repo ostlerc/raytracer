@@ -11,8 +11,8 @@ class Group : public Object {
   virtual ~Group();
 
   void addObject(Object* object);
-  virtual void preprocess();
-  virtual void getBounds(BoundingBox& bbox) const;
+  virtual void preprocess(double);
+  virtual void getBounds(BoundingBox& bbox, const RenderContext&) const;
   virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const;
 
  protected:

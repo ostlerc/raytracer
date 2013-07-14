@@ -12,7 +12,7 @@ class Ray {
   Ray(const Point& origin, const Vector& direction)
     : org(origin), dir(direction) {
   }
-    
+
   ~Ray() {
   }
   Ray(const Ray& copy)

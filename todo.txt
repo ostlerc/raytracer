@@ -1,14 +1,18 @@
-threaded
-triangles
+import models
+reflections
+refractions (prism)
 some new scenes
-animations + ffmpeg movie
 bounding box optimizations
 anti-aliasing
 checkered
 dialetrics
 get rid of shadow rays
-reflections
-refractions (prism)
 perlin noise
-orthogonal camera (meh?)
 motion blur
+
+triangles [done]
+specular [done]
+animations + ffmpeg movie [done]
+
+threaded (meh?)
+orthogonal camera (meh?)

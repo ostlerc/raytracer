@@ -4,9 +4,11 @@
 #include "ConstantBackground.h"
 #include "PointLight.h"
 #include "LambertianMaterial.h"
+#include "SpecularMaterial.h"
 #include "Group.h"
 #include "Plane.h"
 #include "Sphere.h"
+#include "Triangle.h"
 #include "Scene.h"
 #include "Image.h"
 #include <cmath>
@@ -57,8 +59,8 @@ void Parser::readNextToken()
         else if ( character == '"' ) {
           next_token.string_value.clear();
           state = 10;
-        } else if ( character >= 'A' && character <= 'Z' ||
-                    character >= 'a' && character <= 'z' ||
+        } else if ( (character >= 'A' && character <= 'Z') ||
+                    (character >= 'a' && character <= 'z') ||
                     character == '_' ) {
           next_token.string_value = static_cast< char >( character );
           state = 12;
@@ -196,9 +198,9 @@ void Parser::readNextToken()
         state = 10;
         break;
       case 12:
-        if ( character >= '0' && character <= '9' ||
-             character >= 'A' && character <= 'Z' ||
-             character >= 'a' && character <= 'z' ||
+        if ( (character >= '0' && character <= '9') ||
+             (character >= 'A' && character <= 'Z') ||
+             (character >= 'a' && character <= 'z') ||
              character == '_' )
           next_token.string_value.push_back( static_cast< char >( character ) );
         else {
@@ -440,10 +442,41 @@ Material *Parser::parseLambertianMaterial()
   return new LambertianMaterial( color, Kd, Ka );
 }
 
+Material *Parser::parseSpecularMaterial()
+{
+    Color color( 1.0, 1.0, 1.0 );
+    double Kd = 0.6;
+    double Ka = 0.3;
+    double Ks = 0.5;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "color" ) )
+                color = parseColor();
+            else if ( peek( "Kd" ) )
+                Kd = parseReal();
+            else if ( peek( "Ka" ) )
+                Ka = parseReal();
+            else if ( peek( "Ks" ) )
+                Ks = parseReal();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `color', `Kd', `Ka' `Ks' or }." );
+        }
+    }
+
+    return new SpecularMaterial( color, Kd, Ka, Ks );
+}
+
 Material *Parser::parseMaterial()
 {
     if ( peek( "lambertian" ) )
       return parseLambertianMaterial();
+    else if ( peek( "specular" ) )
+        return parseSpecularMaterial();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Material * >::iterator found = defined_materials.find( parseString() );
@@ -487,24 +520,72 @@ Object *Parser::parsePlaneObject()
 
 Object *Parser::parseSphereObject()
 {
-  Material *material = default_material;
-  Point center( 0.0, 0.0, 0.0 );
-  double radius = 0.5;
-  if ( peek( Token::left_brace ) )
-    for ( ; ; )
+    Material *material = default_material;
+
+    int time = 0;
+    Animation<Point> center;
+    Animation<double> radius;
+
+    if ( peek( Token::left_brace ) )
     {
-      if ( peek( "material" ) )
-        material = parseMaterial();
-      else if ( peek( "center" ) )
-        center = parsePoint();
-      else if ( peek( "radius" ) )
-        radius = parseReal();
-      else if ( peek( Token::right_brace ) )
-        break;
-      else
-        throwParseException( "Expected `material', `center', `radius' or }." );
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "center" ) )
+                center.addFrame((double)time, parsePoint());
+            else if ( peek( "radius" ) )
+                radius.addFrame((double)time, parseReal());
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `center', `radius' or }." );
+        }
     }
-  return new Sphere( material, center, radius );
+
+    if(center.isEmpty())
+        center.addFrame(0, Point(0.0, 0.0, 0.0));
+    if(radius.isEmpty())
+        radius.addFrame(0, 0.5);
+
+    return new Sphere( material, center, radius );
+}
+
+Object *Parser::parseTriangleObject()
+{
+    Material *material = default_material;
+    Point p1( 0.0, 0.0, 0.0 );
+    Point p2( 0.0, 0.0, 0.0 );
+    Point p3( 0.0, 0.0, 0.0 );
+    Vector normal( 0.0, 0.0, 0.0 );
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "p1" ) )
+                p1 = parsePoint();
+            else if ( peek( "p2" ) )
+                p2 = parsePoint();
+            else if ( peek( "p3" ) )
+                p3 = parsePoint();
+            else if ( peek( "normal" ) )
+                normal = parseVector();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `p1', `p2', `p3', `normal' or }." );
+        }
+    }
+
+    return new Triangle( material, p1, p2, p3, normal );
 }
 
 Object *Parser::parseObject()
@@ -515,6 +596,8 @@ Object *Parser::parseObject()
         return parsePlaneObject();
     else if ( peek( "sphere" ) )
         return parseSphereObject();
+    else if ( peek( "triangle" ) )
+        return parseTriangleObject();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Object * >::iterator found = defined_objects.find( parseString() );
@@ -530,7 +613,8 @@ Parser::Parser(
   : input( input ),
     line_number( 1 ),
     column_number( 0 ),
-    default_material( new LambertianMaterial( Color( 1.0, 1.0, 1.0 ), 0.6, 0.3 ) )
+    default_material( new LambertianMaterial( Color( 1.0, 1.0, 1.0 ), 0.6, 0.3 ) ),
+    max_time(0)
 {
   readNextToken();
 }
@@ -579,6 +663,7 @@ Scene *Parser::parseScene(
         throwParseException( "Expected `filename', `xres', `yres', `maxraydepth', `minattenuation', "
                              "`camera', `background', `ambient', `light', `scene', or `define'." );
   }
-  scene->setImage( new Image( xres, yres ) );
+  for(int i = 0; i <= max_time; i++)
+      scene->addImage( new Image( xres, yres ) );
   return scene;
 }

@@ -16,20 +16,20 @@ void Group::addObject(Object* object)
   objects.push_back(object);
 }
 
-void Group::preprocess()
+void Group::preprocess(double maxTime)
 {
   Object*const* begin = &objects[0];
   Object*const* end = &objects[0]+objects.size();
   while (begin != end)
-    (*begin++)->preprocess();
+    (*begin++)->preprocess(maxTime);
 }
 
-void Group::getBounds(BoundingBox& bbox) const
+void Group::getBounds(BoundingBox& bbox, const RenderContext& context) const
 {
   Object*const* begin = &objects[0];
   Object*const* end = &objects[0]+objects.size();
   while (begin != end)
-    (*begin++)->getBounds(bbox);
+    (*begin++)->getBounds(bbox, context);
 }
 
 void Group::intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const

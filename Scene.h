@@ -41,11 +41,11 @@ class Scene {
     camera = cam;
   }
 
-  inline Image* getImage() const {
-    return image;
+  inline std::vector<Image*> getImages() const {
+    return images;
   }
-  void setImage(Image* im) {
-    image = im;
+  void addImage(Image* im) {
+    images.push_back(im);
   }
 
   void addLight(Light* light) {
@@ -75,8 +75,8 @@ class Scene {
     minAttenuation = atten;
   }
 
-  void preprocess();
-  void render();
+  void preprocess(double maxTime);
+  void render(int time);
   double traceRay(Color& result, const RenderContext& context, const Ray& ray, const Color& attenuation, int depth) const;
   double traceRay(Color& result, const RenderContext& context, const Object* obj, const Ray& ray, const Color& attenuation, int depth) const;
 
@@ -87,7 +87,7 @@ class Scene {
   Background* background;
   Camera* camera;
   Color ambient;
-  Image* image;
+  std::vector<Image*> images;
   Object* object;
   std::vector<Light*> lights;
   int maxRayDepth;

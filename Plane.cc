@@ -33,7 +33,7 @@ void Plane::normal(Vector& normal, const RenderContext&,
   normal = n;
 }
 
-void Plane::getBounds(BoundingBox& bbox) const
+void Plane::getBounds(BoundingBox& bbox, const RenderContext&) const
 {
   cerr <<  "Plane::getBounds() called!" << endl;
   exit( 1 );

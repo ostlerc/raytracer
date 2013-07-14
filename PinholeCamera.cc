@@ -3,6 +3,7 @@
 #include "Ray.h"
 #include "Math.h"
 #include <math.h>
+#include <iostream>
 
 PinholeCamera::PinholeCamera(const Point& eye, const Point& lookat, const Vector& up,
                              double hfov)
@@ -24,7 +25,7 @@ void PinholeCamera::preprocess(double aspect_ratio)
   u.normalize();
   u *= ulen;
   double vlen = ulen/aspect_ratio;
-  v.normalize(); 
+  v.normalize();
   v *= vlen;
 }
 
