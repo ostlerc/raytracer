@@ -5,6 +5,7 @@
 #include "Primitive.h"
 #include "Animation.h"
 #include "Point.h"
+#include <map>
 class Ray;
 
 class Sphere : public Primitive {
@@ -22,6 +23,7 @@ class Sphere : public Primitive {
  protected:
   Animation<Point> center;
   Animation<double> radius;
+  std::map<double, double> inv_radius;
 };
 
 #endif

@@ -448,6 +448,7 @@ Material *Parser::parseSpecularMaterial()
     double Kd = 0.6;
     double Ka = 0.3;
     double Ks = 0.5;
+    double Kr = 0.0;
 
     if ( peek( Token::left_brace ) )
     {
@@ -461,14 +462,16 @@ Material *Parser::parseSpecularMaterial()
                 Ka = parseReal();
             else if ( peek( "Ks" ) )
                 Ks = parseReal();
+            else if ( peek( "Kr" ) )
+                Kr = parseReal();
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `color', `Kd', `Ka' `Ks' or }." );
+                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr' or }." );
         }
     }
 
-    return new SpecularMaterial( color, Kd, Ka, Ks );
+    return new SpecularMaterial( color, Kd, Ka, Ks, Kr );
 }
 
 Material *Parser::parseMaterial()

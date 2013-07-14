@@ -1,4 +1,3 @@
-
 #include "Background.h"
 #include "Camera.h"
 #include "ConstantBackground.h"
@@ -38,6 +37,7 @@ int main(int argc, char** argv)
     Parser reader( scene_file );
     string filename;
     Scene *scene = reader.parseScene( filename );
+    scene->setMaxRayDepth(30);
 
     cerr << "creating " << reader.maxTime() << " frames" << endl;
     scene->preprocess(reader.maxTime());
@@ -48,7 +48,6 @@ int main(int argc, char** argv)
 
     double t3 = Time::currentSeconds();
 
-    setprecision(2);
     for(unsigned i = 0; i < scene->getImages().size(); i++)
         scene->getImages()[i]->write(std::to_string(i) + "_" + filename);
 

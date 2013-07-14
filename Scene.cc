@@ -1,4 +1,3 @@
-
 #include "Scene.h"
 #include "Background.h"
 #include "Camera.h"
