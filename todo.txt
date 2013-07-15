@@ -1,17 +1,21 @@
 import models
-reflections
 refractions (prism)
 some new scenes
 bounding box optimizations
-anti-aliasing
+anti-aliasing (sampling)
 checkered
 dialetrics
 get rid of shadow rays
 perlin noise
 motion blur
 
+#my ideas
+hierarchical modeling (rotation, translation, scaling)
+global scaling
+
 triangles [done]
 specular [done]
+reflections [done]
 animations + ffmpeg movie [done]
 
 threaded (meh?)

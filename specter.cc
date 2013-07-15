@@ -37,14 +37,22 @@ int main(int argc, char** argv)
     Parser reader( scene_file );
     string filename;
     Scene *scene = reader.parseScene( filename );
-    scene->setMaxRayDepth(30);
+    scene->setMaxRayDepth(10);
 
-    cerr << "creating " << reader.maxTime() << " frames" << endl;
+    cerr << "rendering " << reader.maxTime() << " frames with a max reflection depth of " << scene->getMaxRayDepth() << endl;
     scene->preprocess(reader.maxTime());
 
     double t2 = Time::currentSeconds();
     for(unsigned i = 0; i < scene->getImages().size(); i++)
+    {
+//        double before = Time::currentSeconds();
         scene->render(i);
+/*        cerr << "rendered frame " << setprecision(2)
+            << std::to_string(i) << "/" << std::to_string(reader.maxTime())
+            << " in " << setprecision(3) << Time::currentSeconds() - before
+            << " seconds" << endl;
+*/
+    }
 
     double t3 = Time::currentSeconds();
 

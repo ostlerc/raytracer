@@ -12,6 +12,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <future>
+#include <omp.h>
 using namespace std;
 
 Scene::Scene()
@@ -64,7 +65,13 @@ void Scene::render(int time)
   double ymin = -1. + dy/2.;
   Color atten(1,1,1);
 
-  auto doPixel = [&](int i, int j, double x, double y) {
+#pragma omp parallel for //comment out if your compiler doesn't support openmp
+  for(int i=0;i<yres;i++){
+    //cerr << "y=" << i << '\n';
+    const double y = ymin + i*dy;
+    for(int j=0;j<xres;j++){
+      const double x = xmin + j*dx;
+
       Ray ray;
       RenderContext context(this, time);
       camera->makeRay(ray, context, x, y);
@@ -79,18 +86,6 @@ void Scene::render(int time)
           background->getBackgroundColor(result, context, ray);
       }
       images[time]->set(j, i, result);
-  };
-
-  for(int i=0;i<yres;i++){
-    //cerr << "y=" << i << '\n';
-    double y = ymin + i*dy;
-    for(int j=0;j<xres;j++){
-      double x = xmin + j*dx;
-
-      //this threading code is actually slower...
-      doPixel(i,j,x,y);
-      //auto f = std::async(launch::async | launch::deferred, doPixel, i,j,x,y);
-      //f.get();
     }
   }
 }
