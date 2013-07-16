@@ -7,6 +7,7 @@
 #include "Vector.h"
 
 #include <iostream>
+using namespace std;
 
 Box::Box(Material* material, Animation<Point>& min, Animation<Point>& max)
 : Primitive(material), min(min), max(max) {
@@ -21,7 +22,7 @@ void Box::preprocess(double maxTime)
     max.preprocess(maxTime);
 
     _pairs.resize(maxTime+1);
-    for(int i = 0; i < maxTime; i++)
+    for(int i = 0; i <= maxTime; i++)
     {
         _pairs[i] = PointPair(min(i), max(i));
     }
@@ -64,10 +65,7 @@ void Box::intersect(HitRecord& hit, const RenderContext& context, const Ray& ray
     if (tzmax < tmax)
         tmax = tzmax;
 
-    if(tmin > EPSILON)
-        hit.hit(tmin, this, matl);
-    else if(tmax > EPSILON)
-        hit.hit(tmax, this, matl);
+    hit.hit(tmin, this, matl);
 }
 
 void Box::normal(Vector& normal, const RenderContext& context, const Point& hitpos,
@@ -98,4 +96,6 @@ void Box::normal(Vector& normal, const RenderContext& context, const Point& hitp
         normal = Vector(0, 0, -1);
     else if(localMax.z() < EPSILON)
         normal = Vector(0, 0,  1);
+    else
+        cerr << "broken" << endl;
 }

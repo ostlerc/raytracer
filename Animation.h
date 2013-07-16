@@ -30,7 +30,7 @@ public:
 
     void preprocess(double maxTime)
     {
-        if(maxTime < 0.0) exit(1);
+        if(maxTime < 0) exit(1);
 
         values.resize(maxTime+1);
         for(int i = 0; i <= maxTime; i++)

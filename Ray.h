@@ -16,7 +16,7 @@ class Ray {
   ~Ray() {
   }
   Ray(const Ray& copy)
-    : org(copy.org), dir(copy.dir) {
+    : org(copy.org), dir(copy.dir), inv_dir(copy.inv_dir) {
   }
   Ray& operator=(const Ray& copy) {
     org = copy.org;
