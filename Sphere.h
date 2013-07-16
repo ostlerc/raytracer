@@ -1,4 +1,3 @@
-
 #ifndef Sphere_h
 #define Sphere_h
 
@@ -13,7 +12,7 @@ class Sphere : public Primitive {
   Sphere(Material* material,
           Animation<Point>& center,
           Animation<double> radius);
-  virtual ~Sphere();
+  virtual ~Sphere() {};
 
   virtual void getBounds(BoundingBox& bbox, const RenderContext&) const;
   virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const;

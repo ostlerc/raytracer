@@ -10,7 +10,7 @@ class Ray {
   Ray() {
   }
   Ray(const Point& origin, const Vector& direction)
-    : org(origin), dir(direction) {
+    : org(origin), dir(direction), inv_dir(dir.inverse()) {
   }
 
   ~Ray() {
@@ -21,6 +21,7 @@ class Ray {
   Ray& operator=(const Ray& copy) {
     org = copy.org;
     dir = copy.dir;
+    inv_dir = copy.inv_dir;
     return *this;
   }
 
@@ -30,9 +31,13 @@ class Ray {
   const Vector& direction() const {
     return dir;
   }
+  const Vector& inv_direction() const {
+      return inv_dir;
+  }
  private:
    Point org;
    Vector dir;
+   Vector inv_dir;
 };
 
 #endif

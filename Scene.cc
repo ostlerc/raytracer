@@ -29,13 +29,10 @@ Scene::~Scene()
   delete object;
   delete background;
   delete camera;
+  delete image;
   for(int i=0;i<static_cast<int>(lights.size());i++){
     Light* light = lights[i];
     delete light;
-  }
-  for(int i=0;i<static_cast<int>(images.size());i++){
-      Image* image = images[i];
-      delete image;
   }
 }
 
@@ -46,19 +43,19 @@ void Scene::preprocess(double maxTime)
     Light* light = lights[i];
     light->preprocess();
   }
-  double aspect_ratio = images[0]->aspect_ratio();
+  double aspect_ratio = image->aspect_ratio();
   camera->preprocess(aspect_ratio);
   object->preprocess(maxTime);
 }
 
 void Scene::render(int time)
 {
-  if(!object || !background || !camera || images.empty() || lights.empty()){
+  if(!object || !background || !camera || lights.empty()){
     cerr << "Incomplete scene, cannot render!\n";
     exit(1);
   }
-  int xres = images[time]->getXresolution();
-  int yres = images[time]->getYresolution();
+  int xres = image->getXresolution();
+  int yres = image->getYresolution();
   double dx = 2./xres;
   double xmin = -1. + dx/2.;
   double dy = 2./yres;
@@ -85,7 +82,7 @@ void Scene::render(int time)
       } else {
           background->getBackgroundColor(result, context, ray);
       }
-      images[time]->set(j, i, result);
+      image->set(j, i, result);
     }
   }
 }

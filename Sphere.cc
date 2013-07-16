@@ -8,12 +8,8 @@
 #include <math.h>
 #include <map>
 
-    Sphere::Sphere(Material* material, Animation<Point>& center, Animation<double> radius)
+Sphere::Sphere(Material* material, Animation<Point>& center, Animation<double> radius)
 : Primitive(material), center(center), radius(radius)
-{
-}
-
-Sphere::~Sphere()
 {
 }
 

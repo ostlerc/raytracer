@@ -55,6 +55,7 @@ class Point {
   Point operator-(const Vector& v) const {
     return Point(data[0]-v.x(), data[1]-v.y(), data[2]-v.z());
   }
+
   Point& operator+=(const Vector& v) {
     data[0]+=v.x();
     data[1]+=v.y();

@@ -41,11 +41,11 @@ class Scene {
     camera = cam;
   }
 
-  inline std::vector<Image*> getImages() const {
-    return images;
+  inline Image* getImage() const {
+    return image;
   }
-  void addImage(Image* im) {
-    images.push_back(im);
+  void setImage(Image* im) {
+    image = im;
   }
 
   void addLight(Light* light) {
@@ -87,7 +87,7 @@ class Scene {
   Background* background;
   Camera* camera;
   Color ambient;
-  std::vector<Image*> images;
+  Image* image;
   Object* object;
   std::vector<Light*> lights;
   int maxRayDepth;

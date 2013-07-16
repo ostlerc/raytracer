@@ -39,11 +39,11 @@ int main(int argc, char** argv)
     Scene *scene = reader.parseScene( filename );
     scene->setMaxRayDepth(10);
 
-    cerr << "rendering " << reader.maxTime() << " frames with a max reflection depth of " << scene->getMaxRayDepth() << endl;
+    cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << endl;
     scene->preprocess(reader.maxTime());
 
     double t2 = Time::currentSeconds();
-    for(unsigned i = 0; i < scene->getImages().size(); i++)
+    for(int i = 0; i <= reader.maxTime(); i++)
     {
         double before = Time::currentSeconds();
 
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
                 cerr << endl;
         }
 
-        scene->getImages()[i]->write(std::to_string(i) + "_" + filename);
+        scene->getImage()->write(std::to_string(i) + "_" + filename);
     }
 
 

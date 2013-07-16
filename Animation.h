@@ -18,7 +18,7 @@ public:
         map.push_back(entry(0,val));
     }
 
-    ValueType operator()(double t) const
+    const ValueType& operator()(double t) const
     {
         return values.at(t);
     }
@@ -30,15 +30,16 @@ public:
 
     void preprocess(double maxTime)
     {
-        if(maxTime <= 0) exit(1);
+        if(maxTime < 0.0) exit(1);
 
+        values.resize(maxTime+1);
         for(int i = 0; i <= maxTime; i++)
         {
             auto item = std::find(map.begin(), map.end(), (double)i);
             if(item != map.end())
-                values.push_back((*item).value);
+                values[i] = (*item).value;
             else
-                values.push_back(interpolatedValue(i));
+                values[i] = interpolatedValue(i);
         }
     }
 

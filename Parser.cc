@@ -1,22 +1,24 @@
-
+#include "Box.h"
+#include "ConstantBackground.h"
+#include "Group.h"
+#include "Image.h"
+#include "LambertianMaterial.h"
 #include "Parser.h"
 #include "PinholeCamera.h"
-#include "ConstantBackground.h"
-#include "PointLight.h"
-#include "LambertianMaterial.h"
-#include "SpecularMaterial.h"
-#include "Group.h"
 #include "Plane.h"
+#include "PointLight.h"
+#include "Scene.h"
+#include "SpecularMaterial.h"
 #include "Sphere.h"
 #include "Triangle.h"
-#include "Scene.h"
-#include "Image.h"
+
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <istream>
 #include <sstream>
 #include <string>
-#include <cstdlib>
+
 using namespace std;
 
 void Parser::throwParseException(
@@ -586,7 +588,10 @@ Object *Parser::parseTriangleObject()
                 normal.addFrame((double)time, n);
             }
             else if ( peek( "time" ) )
+            {
                 time = parseInteger();
+                max_time = max(time, max_time);
+            }
             else if ( peek( Token::right_brace ) )
                 break;
             else
@@ -600,6 +605,43 @@ Object *Parser::parseTriangleObject()
     return new Triangle( material, p1, p2, p3, normal );
 }
 
+Object *Parser::parseBoxObject()
+{
+    Material *material = default_material;
+
+    int time = 0;
+    Animation<Point> min;
+    Animation<Point> _max;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "min" ) )
+                min.addFrame(time, parsePoint());
+            else if ( peek( "max" ) )
+                _max.addFrame((double)time, parsePoint());
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `min', `max', `time' or }." );
+        }
+    }
+
+    if(min.isEmpty() || _max.isEmpty())
+        throwParseException( "'box' is missing one or more of its properties `min' or `max'.");
+
+    return new Box( material, min, _max);
+}
+
+
 Object *Parser::parseObject()
 {
     if ( peek( "group" ) )
@@ -610,6 +652,8 @@ Object *Parser::parseObject()
         return parseSphereObject();
     else if ( peek( "triangle" ) )
         return parseTriangleObject();
+    else if ( peek( "box" ) )
+        return parseBoxObject();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Object * >::iterator found = defined_objects.find( parseString() );
@@ -675,7 +719,7 @@ Scene *Parser::parseScene(
         throwParseException( "Expected `filename', `xres', `yres', `maxraydepth', `minattenuation', "
                              "`camera', `background', `ambient', `light', `scene', or `define'." );
   }
-  for(int i = 0; i <= max_time; i++)
-      scene->addImage( new Image( xres, yres ) );
+
+  scene->setImage( new Image( xres, yres ) );
   return scene;
 }

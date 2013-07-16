@@ -81,6 +81,7 @@ class Parser {
   Object *parsePlaneObject();
   Object *parseSphereObject();
   Object *parseTriangleObject();
+  Object *parseBoxObject();
   Object *parseObject();
 
   public:
