@@ -45,23 +45,28 @@ int main(int argc, char** argv)
     double t2 = Time::currentSeconds();
     for(unsigned i = 0; i < scene->getImages().size(); i++)
     {
-//        double before = Time::currentSeconds();
+        double before = Time::currentSeconds();
+
         scene->render(i);
-/*        cerr << "rendered frame " << setprecision(2)
-            << std::to_string(i) << "/" << std::to_string(reader.maxTime())
-            << " in " << setprecision(3) << Time::currentSeconds() - before
-            << " seconds" << endl;
-*/
+
+        if(Time::currentSeconds() - before > 1)
+            cerr << endl << "rendered frame " << setprecision(2)
+                << std::to_string(i) << "/" << std::to_string(reader.maxTime())
+                << " in " << setprecision(3) << Time::currentSeconds() - before
+                << " seconds" << endl;
+        else
+        {
+            cerr << std::to_string(i) << " ";
+            if(i % 10 == 0 && (i > 0))
+                cerr << endl;
+        }
+
+        scene->getImages()[i]->write(std::to_string(i) + "_" + filename);
     }
 
+
     double t3 = Time::currentSeconds();
-
-    for(unsigned i = 0; i < scene->getImages().size(); i++)
-        scene->getImages()[i]->write(std::to_string(i) + "_" + filename);
-
-    double t4 = Time::currentSeconds();
-    cerr << "Setup/load time:\t" << setprecision(3) << t2-t1 << " seconds\n";
-    cerr << "Render time:\t\t" << setprecision(3) << t3-t2 << " seconds\n";
-    cerr << "Post-process time:\t" << setprecision(3) << t4-t3 << " seconds\n";
+    cerr << "Setup/load time:\t\t" << setprecision(3) << t2-t1 << " seconds\n";
+    cerr << "Render/Write to disk time:\t" << setprecision(3) << t3-t2 << " seconds\n";
     return 0;
 }

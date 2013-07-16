@@ -65,7 +65,7 @@ void Scene::render(int time)
   double ymin = -1. + dy/2.;
   Color atten(1,1,1);
 
-#pragma omp parallel for //comment out if your compiler doesn't support openmp
+#pragma omp parallel for //comment out if your compiler doesn't support OpenMP
   for(int i=0;i<yres;i++){
     //cerr << "y=" << i << '\n';
     const double y = ymin + i*dy;
