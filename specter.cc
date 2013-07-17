@@ -64,6 +64,7 @@ int main(int argc, char** argv)
         scene->getImage()->write(std::to_string(i) + "_" + filename);
     }
 
+    cerr << endl;
 
     double t3 = Time::currentSeconds();
     cerr << "Setup/load time:\t\t" << setprecision(3) << t2-t1 << " seconds\n";

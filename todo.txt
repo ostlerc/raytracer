@@ -1,17 +1,33 @@
-import models
-refractions (prism)
-some new scenes
-bounding box optimizations
+image to texture mapping
+color bleeding ?
+camera move
+dieletrics
 anti-aliasing (sampling)
+bounding box optimizations
+import models
+some new scenes
 checkered
-dialetrics
 get rid of shadow rays
 perlin noise
 motion blur
+depth of field
+indirect lighting ?
+soft shadows
 
 #my ideas
 hierarchical modeling (rotation, translation, scaling)
 global scaling
+soft shadows
+glossy reflection
+
+intersection solids
+high dynamic range image ?
+intense language for scene ?
+nerves
+volume costic ? beams of light through dusty room
+physics based renderer
+bands of light
+cone tracing ?
 
 triangles [done]
 specular [done]
