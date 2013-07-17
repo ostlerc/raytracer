@@ -1,4 +1,3 @@
-camera move
 dieletrics
 anti-aliasing (sampling)
 image to texture mapping
@@ -21,7 +20,7 @@ global scaling
 soft shadows
 fog
 
-intersection solids
+intersection solids (like death star)
 high dynamic range image ?
 intense language for scene ?
 nerves
@@ -30,10 +29,14 @@ physics based renderer
 bands of light
 cone tracing ?
 
+orthogonal camera (meh?)
+
 triangles [done]
+box primitive [done]
+disc primitive [done]
+ring primitive [done]
 specular [done]
 reflections [done]
 animations + ffmpeg movie [done]
-
-threaded (meh?)
-orthogonal camera (meh?)
+camera move [done]
+threaded [done]

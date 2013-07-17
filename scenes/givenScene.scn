@@ -1,7 +1,7 @@
 // This is the scene to produce for program #1.
 
-xres 512
-yres 512
+xres 1028
+yres 768
 filename "prog01.ppm"
 
 camera pinhole {
