@@ -6,6 +6,7 @@
 #include "Parser.h"
 #include "PinholeCamera.h"
 #include "Disc.h"
+#include "Ring.h"
 #include "Plane.h"
 #include "PointLight.h"
 #include "Scene.h"
@@ -642,6 +643,35 @@ Object *Parser::parseBoxObject()
     return new Box( material, min, _max);
 }
 
+Object *Parser::parseRingObject()
+{
+    Material *material = default_material;
+    Vector normal( 0.0, 0.0, 1.0 );
+    double radius = 0;
+    double radius2 = 0;
+    Point center( 0.0, 0.0, 0.0 );
+    if ( peek( Token::left_brace ) )
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "normal" ) )
+                normal = parseVector();
+            else if ( peek( "radius" ) )
+                radius = parseReal();
+            else if ( peek( "radius2" ) )
+                radius2 = parseReal();
+            else if ( peek( "center" ) )
+                center = parsePoint();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `normal', `radius', `radius2', `'center' or }." );
+        }
+
+    return new Ring( material, normal, radius, radius2, center );
+}
+
 Object *Parser::parseDiscObject()
 {
     Material *material = default_material;
@@ -662,7 +692,7 @@ Object *Parser::parseDiscObject()
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `material', `point', `normal' or }." );
+                throwParseException( "Expected `material', `normal', `radius', `'center' or }." );
         }
     return new Disc( material, normal, radius, center );
 }
@@ -682,6 +712,8 @@ Object *Parser::parseObject()
         return parseBoxObject();
     else if ( peek( "disc" ) )
         return parseDiscObject();
+    else if ( peek( "ring" ) )
+        return parseRingObject();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Object * >::iterator found = defined_objects.find( parseString() );
