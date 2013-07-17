@@ -5,6 +5,7 @@
 #include "LambertianMaterial.h"
 #include "Parser.h"
 #include "PinholeCamera.h"
+#include "Disc.h"
 #include "Plane.h"
 #include "PointLight.h"
 #include "Scene.h"
@@ -641,6 +642,31 @@ Object *Parser::parseBoxObject()
     return new Box( material, min, _max);
 }
 
+Object *Parser::parseDiscObject()
+{
+    Material *material = default_material;
+    Vector normal( 0.0, 0.0, 1.0 );
+    double radius = 0;
+    Point center( 0.0, 0.0, 0.0 );
+    if ( peek( Token::left_brace ) )
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "normal" ) )
+                normal = parseVector();
+            else if ( peek( "radius" ) )
+                radius = parseReal();
+            else if ( peek( "center" ) )
+                center = parsePoint();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `point', `normal' or }." );
+        }
+    return new Disc( material, normal, radius, center );
+}
+
 
 Object *Parser::parseObject()
 {
@@ -654,6 +680,8 @@ Object *Parser::parseObject()
         return parseTriangleObject();
     else if ( peek( "box" ) )
         return parseBoxObject();
+    else if ( peek( "disc" ) )
+        return parseDiscObject();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Object * >::iterator found = defined_objects.find( parseString() );

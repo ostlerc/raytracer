@@ -1,4 +1,3 @@
-
 #include "Plane.h"
 #include "HitRecord.h"
 #include "Math.h"
