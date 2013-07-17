@@ -22,7 +22,7 @@ Triangle::~Triangle()
 {
 }
 
-void Triangle::preprocess(double maxTime)
+void Triangle::preprocess(int maxTime)
 {
     p0.preprocess(maxTime);
     p1.preprocess(maxTime);

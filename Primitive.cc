@@ -5,6 +5,8 @@
 #include "Ray.h"
 #include "Vector.h"
 
+#include <iostream>
+
 Primitive::Primitive(Material* matl)
   : matl(matl)
 {
@@ -14,9 +16,9 @@ Primitive::~Primitive()
 {
 }
 
-void Primitive::preprocess()
+void Primitive::preprocess(int maxTime)
 {
-  matl->preprocess();
+  matl->preprocess(maxTime);
 }
 
 void Primitive::computeUVW(Vector& uvw, const RenderContext& context,

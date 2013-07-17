@@ -75,7 +75,7 @@ class Scene {
     minAttenuation = atten;
   }
 
-  void preprocess(double maxTime);
+  void preprocess(int maxTime);
   void render(int time);
   double traceRay(Color& result, const RenderContext& context, const Ray& ray, const Color& attenuation, int depth) const;
   double traceRay(Color& result, const RenderContext& context, const Object* obj, const Ray& ray, const Color& attenuation, int depth) const;

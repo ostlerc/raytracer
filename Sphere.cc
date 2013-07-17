@@ -13,13 +13,15 @@ Sphere::Sphere(Material* material, Animation<Point>& center, Animation<double> r
 {
 }
 
-void Sphere::preprocess(double maxTime)
+void Sphere::preprocess(int maxTime)
 {
     center.preprocess(maxTime);
     radius.preprocess(maxTime);
 
     for(int i = 0; i <= maxTime; i++)
-        inv_radius[i] = 1./radius(i);
+        inv_radius.addFrame(i, 1./radius(i));
+
+    inv_radius.preprocess(maxTime);
 }
 
 void Sphere::getBounds(BoundingBox& bbox, const RenderContext& context) const
@@ -55,5 +57,5 @@ void Sphere::normal(Vector& normal, const RenderContext& context, const Point& h
         const Ray& ray, const HitRecord& hit) const
 {
     double time = context.time();
-    normal = (hitpos-center(time))*inv_radius.at(time);
+    normal = (hitpos-center(time))*inv_radius(time);
 }

@@ -12,7 +12,7 @@ class Primitive : public Object {
   Primitive(Material* matl);
   virtual ~Primitive();
 
-  virtual void preprocess();
+  virtual void preprocess(int maxTime);
   virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const = 0;
   virtual void normal(Vector& normal, const RenderContext& context,
                       const Point& hitpos, const Ray& ray, const HitRecord& hit) const = 0;

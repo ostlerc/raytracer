@@ -9,7 +9,7 @@ Material::~Material()
 {
 }
 
-void Material::preprocess()
+void Material::preprocess(int)
 {
 }
 

@@ -10,7 +10,7 @@ class Camera {
   Camera();
   virtual ~Camera();
 
-  virtual void preprocess(double aspect_ratio) = 0;
+  virtual void preprocess(double aspect_ratio, int maxTime) = 0;
   virtual void makeRay(Ray& ray, const RenderContext& context, double x, double y) const = 0;
 
  private:

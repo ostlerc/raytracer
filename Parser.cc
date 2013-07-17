@@ -342,27 +342,39 @@ Color const Parser::parseColor()
 
 Camera *Parser::parsePinholeCamera()
 {
-  Point eye( 0.0, 0.0, 0.0 );
-  Point lookat( 0.0, 1.0, 0.0 );
-  Vector up( 0.0, 0.0, 1.0 );
-  double hfov = 90.0;
-  if ( peek( Token::left_brace ) )
-    for ( ; ; )
-    {
-      if ( peek( "eye" ) )
-        eye = parsePoint();
-      else if ( peek( "lookat" ) )
-        lookat = parsePoint();
-      else if ( peek( "up" ) )
-        up = parseVector();
-      else if ( peek( "hfov" ) )
-        hfov = parseReal();
-      else if ( peek( Token::right_brace ) )
-        break;
-      else
-        throwParseException( "Expected `eye', `lookat', `up', `hfov' or }." );
-    }
-  return new PinholeCamera( eye, lookat, up, hfov );
+    int time = 0;
+
+    Animation<Point> eye;
+    Animation<Point> lookat;
+    Animation<Vector> up;
+    double hfov = 90.0;
+
+    if ( peek( Token::left_brace ) )
+        for ( ; ; )
+        {
+            if ( peek( "eye" ) )
+                eye.addFrame(time, parsePoint());
+            else if ( peek( "lookat" ) )
+                lookat.addFrame(time, parsePoint());
+            else if ( peek( "up" ) )
+                up.addFrame(time, parseVector());
+            else if ( peek( "hfov" ) )
+                hfov = parseReal();
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `eye', `lookat', `up', `hfov' or }." );
+        }
+
+    if(eye.isEmpty() || lookat.isEmpty() || up.isEmpty())
+        throwParseException( "Missing `eye', `lookat' or `up'" );
+
+    return new PinholeCamera( eye, lookat, up, hfov );
 }
 
 Camera *Parser::parseCamera()

@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     scene->setMaxRayDepth(10);
 
     cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << endl;
+
     scene->preprocess(reader.maxTime());
 
     double t2 = Time::currentSeconds();

@@ -36,7 +36,7 @@ Scene::~Scene()
   }
 }
 
-void Scene::preprocess(double maxTime)
+void Scene::preprocess(int maxTime)
 {
   background->preprocess();
   for(int i=0;i<static_cast<int>(lights.size());i++){
@@ -44,7 +44,7 @@ void Scene::preprocess(double maxTime)
     light->preprocess();
   }
   double aspect_ratio = image->aspect_ratio();
-  camera->preprocess(aspect_ratio);
+  camera->preprocess(aspect_ratio, maxTime);
   object->preprocess(maxTime);
 }
 

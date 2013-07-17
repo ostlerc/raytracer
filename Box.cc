@@ -16,7 +16,7 @@ Box::Box(Material* material, Animation<Point>& min, Animation<Point>& max)
 Box::~Box() {
 }
 
-void Box::preprocess(double maxTime)
+void Box::preprocess(int maxTime)
 {
     min.preprocess(maxTime);
     max.preprocess(maxTime);
@@ -79,23 +79,25 @@ void Box::normal(Vector& normal, const RenderContext& context, const Point& hitp
     const Vector& localMin = (hitpos - min(time)).absoluteValue();
     const Vector& localMax = (hitpos - max(time)).absoluteValue();
 
+    const double e = .001;
+
     //x normals
-    if(localMin.x() < EPSILON)
+    if(localMin.x() < e)
         normal = Vector(-1, 0, 0);
-    else if(localMax.x() < EPSILON)
+    else if(localMax.x() < e)
         normal = Vector( 1, 0, 0);
 
     //y normals
-    else if(localMin.y() < EPSILON)
+    else if(localMin.y() < e)
         normal = Vector(0, -1, 0);
-    else if(localMax.y() < EPSILON)
+    else if(localMax.y() < e)
         normal = Vector(0,  1, 0);
 
     //z normals
-    else if(localMin.z() < EPSILON)
+    else if(localMin.z() < e)
         normal = Vector(0, 0, -1);
-    else if(localMax.z() < EPSILON)
+    else if(localMax.z() < e)
         normal = Vector(0, 0,  1);
     else
-        cerr << "broken" << endl;
+        cerr << "broken" << localMax << localMin << endl;
 }

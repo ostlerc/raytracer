@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <math.h>
 
 template<typename ValueType>
 class Animation
@@ -18,9 +19,35 @@ public:
         map.push_back(entry(0,val));
     }
 
-    const ValueType& operator()(double t) const
+    const ValueType& operator()(int t) const
     {
         return values.at(t);
+    }
+
+    const ValueType& operator()(double t) const
+    {
+        //this slows things down considerably.
+        //This should be changed to a map lookup instead of a vector eventually for motion blur
+        /*if(values.empty())
+        {
+            std::cerr << "attempting to access an empty (non preprocessed) animation" << std::endl;
+        }
+        double dummy;
+        if(std::modf(t, &dummy) == 0.0) //t is a whole integer use preprocessed map
+        {
+            if(values.size() < t)
+            {
+                std::cerr << "attempting to access an out of bounds entry" << t << std::endl;
+                exit(1);
+            }
+*/
+            return values.at(t);
+ /*       }
+        else
+        {
+            std::cerr << "adding floating point as a frame is not supported yet!" << std::endl;
+            exit(1);
+        }*/
     }
 
     void addFrame(double t, ValueType v)
@@ -28,7 +55,7 @@ public:
         map.push_back(entry(t,v));
     }
 
-    void preprocess(double maxTime)
+    void preprocess(int maxTime)
     {
         if(maxTime < 0) exit(1);
 

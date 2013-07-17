@@ -18,11 +18,11 @@ class Sphere : public Primitive {
   virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const;
   virtual void normal(Vector& normal, const RenderContext& context,
                       const Point& hitpos, const Ray& ray, const HitRecord& hit) const;
-  virtual void preprocess(double maxTime);
+  virtual void preprocess(int maxTime);
  protected:
   Animation<Point> center;
   Animation<double> radius;
-  std::map<double, double> inv_radius;
+  Animation<double> inv_radius;
 };
 
 #endif

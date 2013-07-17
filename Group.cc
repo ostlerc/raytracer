@@ -16,7 +16,7 @@ void Group::addObject(Object* object)
   objects.push_back(object);
 }
 
-void Group::preprocess(double maxTime)
+void Group::preprocess(int maxTime)
 {
   Object*const* begin = &objects[0];
   Object*const* end = &objects[0]+objects.size();

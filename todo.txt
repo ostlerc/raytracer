@@ -1,8 +1,8 @@
-image to texture mapping
-color bleeding ?
 camera move
 dieletrics
 anti-aliasing (sampling)
+image to texture mapping
+color bleeding
 bounding box optimizations
 import models
 some new scenes
@@ -13,12 +13,13 @@ motion blur
 depth of field
 indirect lighting ?
 soft shadows
+glossy reflection
 
 #my ideas
 hierarchical modeling (rotation, translation, scaling)
 global scaling
 soft shadows
-glossy reflection
+fog
 
 intersection solids
 high dynamic range image ?

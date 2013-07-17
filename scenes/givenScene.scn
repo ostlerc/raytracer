@@ -1,7 +1,7 @@
 // This is the scene to produce for program #1.
 
-xres 512
-yres 512
+xres 1024
+yres 1024
 filename "prog01.ppm"
 
 camera pinhole {
@@ -9,6 +9,12 @@ camera pinhole {
   lookat [ 0.5, 0.0, 3.5 ]
   up [ 0.0, 0.0, 1.0 ]
   hfov 26.0
+  time 100
+  eye [ -32.0, -20.0, 10.0 ]
+  time 200
+  eye [ -2.0, -20.0, 10.0 ]
+  time 300
+  eye [ 40.0, -20.0, 10.0 ]
 }
 
 background constant {

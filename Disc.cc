@@ -36,6 +36,6 @@ void Disc::normal(Vector& normal, const RenderContext&,
 
 void Disc::getBounds(BoundingBox& bbox, const RenderContext&) const
 {
-    //TODO: 
+    //TODO:
 }
 

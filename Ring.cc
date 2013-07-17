@@ -37,6 +37,6 @@ void Ring::normal(Vector& normal, const RenderContext&,
 
 void Ring::getBounds(BoundingBox& bbox, const RenderContext&) const
 {
-    //TODO: 
+    //TODO:
 }
 

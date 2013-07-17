@@ -1,5 +1,6 @@
 
 #include "Object.h"
+#include <iostream>
 
 Object::Object()
 {
@@ -9,6 +10,6 @@ Object::~Object()
 {
 }
 
-void Object::preprocess(double)
+void Object::preprocess(int)
 {
 }
