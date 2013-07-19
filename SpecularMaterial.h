@@ -21,6 +21,7 @@ class SpecularMaterial : public Material {
         float Ka; //ambient
         float Ks; //specular
         float Kr; //reflection
+        float exp; //specular exponent
 };
 
 #endif //SpecularMaterial_h
