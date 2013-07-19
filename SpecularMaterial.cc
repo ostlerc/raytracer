@@ -13,8 +13,8 @@
 #include <cfloat>
 using namespace std;
 
-SpecularMaterial::SpecularMaterial(const Color& color, float Kd, float Ka, float Ks, float Kr)
-:color(color), Kd(Kd), Ka(Ka), Ks(Ks), Kr(Kr)
+SpecularMaterial::SpecularMaterial(const Color& color, float Kd, float Ka, float Ks, float Kr, float exp)
+:color(color), Kd(Kd), Ka(Ka), Ks(Ks), Kr(Kr), exp(exp)
 {
 }
 
@@ -60,7 +60,7 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
             T.normalize();
             H1.normalize();
 
-            double s = pow( Clamp(Dot(normal, H1), 0.0, 1.0), 50.0); //Specular fraction
+            double s = pow( Clamp(Dot(normal, H1), 0.0, 1.0), exp); //Specular fraction
 
             if(!shadowhit.getPrimitive()) // No shadows...
                 light += light_color*((Kd*cosphi) + (Ks*s));

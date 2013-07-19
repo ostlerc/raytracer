@@ -1,3 +1,9 @@
+maxraydepth parsed
+fresnel
+specular exponent
+
+
+
 dieletrics
 anti-aliasing (sampling)
 image to texture mapping

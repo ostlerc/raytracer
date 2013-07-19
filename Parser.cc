@@ -11,6 +11,7 @@
 #include "PointLight.h"
 #include "Scene.h"
 #include "SpecularMaterial.h"
+#include "RefractionMaterial.h"
 #include "Sphere.h"
 #include "Triangle.h"
 
@@ -465,6 +466,7 @@ Material *Parser::parseSpecularMaterial()
     double Ka = 0.3;
     double Ks = 0.5;
     double Kr = 0.0;
+    double exp = 50;
 
     if ( peek( Token::left_brace ) )
     {
@@ -480,6 +482,8 @@ Material *Parser::parseSpecularMaterial()
                 Ks = parseReal();
             else if ( peek( "Kr" ) )
                 Kr = parseReal();
+            else if ( peek( "exp" ) )
+                exp = parseReal();
             else if ( peek( Token::right_brace ) )
                 break;
             else
@@ -487,7 +491,45 @@ Material *Parser::parseSpecularMaterial()
         }
     }
 
-    return new SpecularMaterial( color, Kd, Ka, Ks, Kr );
+    return new SpecularMaterial( color, Kd, Ka, Ks, Kr, exp );
+}
+
+Material *Parser::parseRefractionMaterial()
+{
+    Color color( 1.0, 1.0, 1.0 );
+    double Kd = 0.2;
+    double Ka = 0.1;
+    double Ks = 0.0;
+    double Kr = 0.0;
+    double Krefr = 0.7;
+    double refr_index = 1.33;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "color" ) )
+                color = parseColor();
+            else if ( peek( "Kd" ) )
+                Kd = parseReal();
+            else if ( peek( "Ka" ) )
+                Ka = parseReal();
+            else if ( peek( "Ks" ) )
+                Ks = parseReal();
+            else if ( peek( "Kr" ) )
+                Kr = parseReal();
+            else if ( peek( "Krefr" ) )
+                Krefr = parseReal();
+            else if ( peek( "refr_index" ) )
+                refr_index = parseReal();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `Krefr', `refr_index' or }." );
+        }
+    }
+
+    return new RefractionMaterial( color, Kd, Ka, Ks, Kr, Krefr, refr_index );
 }
 
 Material *Parser::parseMaterial()
@@ -496,6 +538,8 @@ Material *Parser::parseMaterial()
       return parseLambertianMaterial();
     else if ( peek( "specular" ) )
         return parseSpecularMaterial();
+    else if ( peek( "refraction" ) )
+        return parseRefractionMaterial();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Material * >::iterator found = defined_materials.find( parseString() );
