@@ -37,7 +37,6 @@ int main(int argc, char** argv)
     Parser reader( scene_file );
     string filename;
     Scene *scene = reader.parseScene( filename );
-    scene->setMaxRayDepth(10);
 
     cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << endl;
 

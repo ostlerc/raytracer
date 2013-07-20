@@ -24,8 +24,10 @@ void Ring::intersect(HitRecord& hit, const RenderContext& context, const Ray& ra
         double t = (d-Dot(n, ray.origin()))/denom;
         Point hitpos = ray.origin()+ray.direction()*t;
         double l = (hitpos - q).length();
-        if(l < r && l > r2)
+        if(l < r2 && l > r)
+        {
             hit.hit(t, this, matl);
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 #include "Background.h"
+#include "Background.h"
 #include "HitRecord.h"
 #include "Light.h"
 #include "Math.h"
@@ -10,13 +11,10 @@
 #include "RefractionMaterial.h"
 #include "Vector.h"
 
-#include <iostream>
-#include <cfloat>
-
 using namespace std;
 
-RefractionMaterial::RefractionMaterial(const Color& color, float Kd, float Ka, float Ks, float Kr, float exp, float Krefr, float refr_index)
-:color(color), Kd(Kd), Ka(Ka), Ks(Ks), Kr(Kr), exp(exp), Krefr(Krefr), refr_index(refr_index)
+RefractionMaterial::RefractionMaterial(Animation<float> eta, Animation<int> exp)
+:eta(eta), exp(exp)
 {
 }
 
@@ -24,23 +22,38 @@ RefractionMaterial::~RefractionMaterial()
 {
 }
 
+void RefractionMaterial::preprocess(int maxTime)
+{
+    eta.preprocess(maxTime);
+    exp.preprocess(maxTime);
+}
+
 void RefractionMaterial::shade(Color& result, const RenderContext& context,
         const Ray& ray, const HitRecord& hit, const Color& atten, int depth) const
 {
+    double time = context.time();
     const Scene* scene = context.getScene();
+    const Object* world = scene->getObject();
     const vector<Light*>& lights = scene->getLights();
     Point hitpos = ray.origin()+ray.direction()*hit.minT();
-    Vector normal;
-    hit.getPrimitive()->normal(normal, context, hitpos, ray, hit);
-    double costheta = Dot(normal, ray.direction());
-    if(costheta > 0)
-        normal = -normal;
+    Vector normal, unflipped_normal;
+    hit.getPrimitive()->normal(unflipped_normal, context, hitpos, ray, hit);
+    double costheta = Dot(unflipped_normal, ray.direction());
 
-    const Object* world = scene->getObject();
+    bool inside = false;
 
-    Color light = scene->getAmbient()*Ka;
-    Color rColor;
-    Color refr_color;
+    if(costheta > 0) //this is if we are exiting the object or not
+    {
+        normal = -unflipped_normal;
+        inside = true;
+    }
+    else
+    {
+        costheta = -costheta;
+        normal = unflipped_normal;
+    }
+
+    Color c(0.0, 0.0, 0.0);
 
     Light*const* begin = &lights[0];
     Light*const* end = &lights[0]+lights.size();
@@ -49,95 +62,62 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
         Vector light_direction;
 
         double dist = (*begin++)->getLight(light_color, light_direction, context, hitpos);
-        double cosphi = Dot(normal, light_direction);
+        double cosphi = Dot(unflipped_normal, light_direction);
         if(cosphi > 0){
             // Cast shadow rays...
             HitRecord shadowhit(dist);
             Ray shadowray(hitpos, light_direction);
             world->intersect(shadowhit, context, shadowray);
-
-            Vector T = ray.origin() - hitpos; //Points from hitpos towards eye
-            Vector H1 = T + light_direction; //halfway vector
-
-            T.normalize();
-            H1.normalize();
-
-            double s = pow( Clamp(Dot(normal, H1), 0.0, 1.0), exp); //Specular fraction
-
             if(!shadowhit.getPrimitive()) // No shadows...
-                light += light_color*((Ks*s));
+            {
+                Vector h = inside
+                  ? light_direction + ray.direction()
+                  : light_direction - ray.direction(); //halfway vector
+
+                h.normalize();
+                double s = pow( Dot(unflipped_normal, h), exp(time)); //Specular fraction
+                c += light_color*s;
+            }
         }
     }
 
-    if(depth < context.getScene()->getMaxRayDepth())
-    {
-        float ndoti, two_ndoti, ndoti2, a,b,b2,D2;
-        Vector T;
-        ndoti = Dot(normal,ray.direction());
-        ndoti2 = ndoti*ndoti;                    // 1 mul
-        if (ndoti>=0.0) { b=1.; b2=refr_index;} else {b=1.;b2=1./refr_index;}
-        D2 = 1.0f - b2*(1.0f - ndoti2);
+    result = c;
 
-        if (D2>=0.0f) {
-            if (ndoti >= 0.0f)
-                a = b * ndoti - sqrtf(D2); // 2 mul, 3 add, 1 sqrt
-            else
-                a = b * ndoti + sqrtf(D2);
-            T = a*normal - b*ray.direction();     // 6 mul, 3 add
-        } else {
-            // total internal reflection
-            // this usually doesn't happen, so I don't count it.
-            two_ndoti = ndoti + ndoti;         // +1 add
-            T = two_ndoti * normal - ray.direction();
-        }
-        T.normalize();
-        Ray refraction(hitpos, T);
-        //double t =
-        scene->traceRay(refr_color, context, refraction, atten, depth+1);
-
-        result = refr_color*Krefr;
-    }
-    else
-        result = light*color;
-    /*if(depth < context.getScene()->getMaxRayDepth())
+    if(depth < scene->getMaxRayDepth())
     {
-        // calculate refraction
-        if (Krefr > 0.)
+        double _eta = inside ? 1. / eta(time) : eta(time);
+
+        Vector rDir = ray.direction() + 2.*costheta * normal;
+        rDir.normalize();
+        Ray reflectionRay(hitpos, rDir);
+        Color reflect_color;
+
+        double costheta2sqrd = 1.0 + (costheta*costheta - 1.0)/(_eta*_eta);
+
+        if (costheta2sqrd < 0.) //total internal reflection
         {
-            double n = 1.0 / refr_index;
-            if(costheta > 0) //we are leaving the object, so inverse the refraction index
-            {
-                n = 1. / n;
-            }
-            const double cosI = Dot(normal, ray.direction());
-            const double sinT2 = n * n * (1.0 - cosI * cosI);
-
-            if (sinT2 > 1.0)
-            {
-                //total internal reflection
-                //cerr << "invalid refraction" << endl;
-
-                if(Kr > 0.) //reflection
-                {
-                    double reflet = 2. * Dot(ray.direction(), normal);
-                    Vector rDir = ray.direction() - reflet * normal;
-                    rDir.normalize();
-                    Ray reflection(hitpos, rDir);
-                    //double t =
-                    scene->traceRay(rColor, context, reflection, atten, depth+1);
-                }
-            }
-            else
-            {
-                Vector refract =  n * ray.direction() - (n + sqrt(1.0 - sinT2)) * normal;
-                refract.normalize();
-                Ray refractionRay(hitpos, refract);
-                scene->traceRay(refr_color, context, refractionRay, atten, depth+1);
-            }
+            scene->traceRay(reflect_color, context, reflectionRay, atten, depth+1);
+            result += reflect_color;
         }
+        else
+        {
+            double costheta2 = sqrt(costheta2sqrd);
+            double Ro = (_eta - 1.)/(_eta + 1.);
+            Ro *= Ro;
 
-        result = light*color*0.1 + rColor*Kr + refr_color*Krefr;
+            double fresnel_reflect= Ro + (1. - Ro)*pow(1.-Min(costheta, costheta2),5);
+            double fresnel_refract = 1. - fresnel_reflect;
+
+            double eta_inverse = 1.0/_eta;
+            Vector refract_dir = ray.direction()*eta_inverse + (costheta*eta_inverse - costheta2)*normal;
+            //refract_dir.normalize(); //should already be normalized
+            Ray refractionRay(hitpos, refract_dir);
+
+            Color refraction_color;
+            scene->traceRay(reflect_color, context, reflectionRay, atten*fresnel_reflect, depth+1);
+            scene->traceRay(refraction_color, context, refractionRay, atten*fresnel_refract, depth+1);
+
+            result += reflect_color*fresnel_reflect + refraction_color*fresnel_refract;
+        }
     }
-    else*/
-        //result = light*color;
 }

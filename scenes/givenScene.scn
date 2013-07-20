@@ -92,21 +92,17 @@ scene group {
     radius 0.5
   }
   sphere {
-    material specular {
-      color [ 0.3, 1.0, 0.7 ]
-      Kd 0.6
-      Ka 0.4
-      Kr 0.15
+    material metal {
+      color 0.8
+      exp 100
     }
     center [ 1.5, 3.5, 4.0 ]
     radius 2.4
   }
   sphere {
-    material specular {
-      color [ 1.0, 0.9, 0.4 ]
-      Kd 0.6
-      Ka 0.4
-      Kr 0.3
+    material metal {
+      color 0.7
+      exp 100
     }
     center [ -2.0, 2.0, 5.0 ]
     radius 0.5
@@ -136,11 +132,9 @@ scene group {
     p3 [ 3.0, 1.5, 6.0 ]
   }
   box {
-    material specular {
-      color [ 0.3, 0.2, 0.3 ]
-      Kd 0.6
-      Ka 0.4
-      Kr 0.4
+    material refraction {
+        eta 2.4
+        exp 1000
     }
     min [ -3.5, -3.5, 2.0 ]
     max [ 0.0, 0.0, 2.35 ]

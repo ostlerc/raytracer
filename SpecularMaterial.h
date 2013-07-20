@@ -7,7 +7,7 @@
 
 class SpecularMaterial : public Material {
     public:
-        SpecularMaterial(const Color& color, Animation<float> Kd, Animation<float> Ka, Animation<float> Ks, Animation<float> Kr, Animation<float> exp);
+        SpecularMaterial(const Color& color, Animation<Color> highlight, Animation<float> Kd, Animation<float> Ka, Animation<float> Kr, Animation<int> exp);
         virtual ~SpecularMaterial();
 
         virtual void shade(Color& result, const RenderContext& context, const Ray& ray,
@@ -20,11 +20,11 @@ class SpecularMaterial : public Material {
         SpecularMaterial& operator=(const SpecularMaterial&);
 
         Color color;
+        Animation<Color> highlight;
         Animation<float> Kd; //diffuse
         Animation<float> Ka; //ambient
-        Animation<float> Ks; //specular
         Animation<float> Kr; //reflection
-        Animation<float> exp; //specular exponent
+        Animation<int> exp; //specular exponent
 };
 
 #endif //SpecularMaterial_h

@@ -38,7 +38,7 @@ void MetalMaterial::shade(Color& result, const RenderContext& context,
     Vector normal;
     hit.getPrimitive()->normal(normal, context, hitpos, ray, hit);
     double costheta = Dot(normal, ray.direction());
-    if(costheta > 0)
+    if(costheta > 0) //this is if we are exiting the object or not
         normal = -normal;
     else
         costheta = -costheta;
@@ -76,7 +76,6 @@ void MetalMaterial::shade(Color& result, const RenderContext& context,
     if(depth < context.getScene()->getMaxRayDepth())
     {
         Vector rDir = ray.direction() + (2.*costheta) * normal;
-        rDir.normalize();
         Ray reflect_ray(hitpos, rDir);
         Color rColor;
         scene->traceRay(rColor, context, reflect_ray, atten, depth+1);

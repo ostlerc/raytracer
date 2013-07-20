@@ -13,8 +13,8 @@
 #include <cfloat>
 using namespace std;
 
-SpecularMaterial::SpecularMaterial(const Color& color, Animation<float> Kd, Animation<float> Ka, Animation<float> Ks, Animation<float> Kr, Animation<float> exp)
-:color(color), Kd(Kd), Ka(Ka), Ks(Ks), Kr(Kr), exp(exp)
+SpecularMaterial::SpecularMaterial(const Color& color, Animation<Color> highlight, Animation<float> Kd, Animation<float> Ka, Animation<float> Kr, Animation<int> exp)
+:color(color), highlight(highlight), Kd(Kd), Ka(Ka), Kr(Kr), exp(exp)
 {
 }
 
@@ -24,9 +24,9 @@ SpecularMaterial::~SpecularMaterial()
 
 void SpecularMaterial::preprocess(int maxTime)
 {
+    highlight.preprocess(maxTime);
     Kd.preprocess(maxTime);
     Ka.preprocess(maxTime);
-    Ks.preprocess(maxTime);
     Kr.preprocess(maxTime);
     exp.preprocess(maxTime);
 }
@@ -47,8 +47,7 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
     const Object* world = scene->getObject();
 
     Color light = scene->getAmbient()*Ka(time);
-    Color rcolor;
-    double i_Kr = 1. - Kr(time);
+    Color specular(0,0,0);
 
     Light*const* begin = &lights[0];
     Light*const* end = &lights[0]+lights.size();
@@ -64,38 +63,29 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
             Ray shadowray(hitpos, light_direction);
             world->intersect(shadowhit, context, shadowray);
 
-            Vector T = ray.origin() - hitpos; //Points from hitpos towards eye
-            Vector H1 = T + light_direction; //halfway vector
-
-            T.normalize();
-            H1.normalize();
-
-            double s = pow( Clamp(Dot(normal, H1), 0.0, 1.0), exp(time)); //Specular fraction
-
             if(!shadowhit.getPrimitive()) // No shadows...
-                light += light_color*((Kd(time)*cosphi) + (Ks(time)*s));
+            {
+                Vector h = light_direction - ray.direction(); //halfway vector
+                h.normalize();
+
+                light += light_color*(Kd(time)*cosphi);
+                double s = pow( Dot(normal, h), exp(time)); //Specular fraction
+                specular += light_color*s;
+            }
         }
     }
+
+    result = specular*highlight(time) + light*color;
 
     if(depth < context.getScene()->getMaxRayDepth() && Kr(time) > 0.)
     {
         double reflet = 2. * Dot(ray.direction(), normal);
-        Vector rDir = ray.direction() - reflet * normal;
+        Vector rDir = ray.direction() + reflet * normal;
         rDir.normalize();
         Ray reflection(hitpos, rDir);
-        HitRecord rhit(DBL_MAX);
-        context.getScene()->getObject()->intersect(rhit, context, reflection);
-        if(rhit.getPrimitive()){
-            // Ray hit something...
-            const Material* matl = rhit.getMaterial();
-            matl->shade(rcolor, context, reflection, rhit, atten, depth+1);
-        } else {
-            context.getScene()->getBackground()->getBackgroundColor(rcolor, context, reflection);
-        }
+        Color rcolor;
+        scene->traceRay(rcolor, context, reflection, atten, depth+1);
 
-        result = light*color*i_Kr + rcolor*Kr(time);
+        result += rcolor * Kr(time);
     }
-    else
-        result = light*color;
-
 }

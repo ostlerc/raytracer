@@ -464,11 +464,11 @@ Material *Parser::parseSpecularMaterial()
 {
     int time = 0;
     Color color( 1.0, 1.0, 1.0 );
+    Animation<Color> highlight;
     Animation<float> Kd;
     Animation<float> Ka;
-    Animation<float> Ks;
     Animation<float> Kr;
-    Animation<float> exp;
+    Animation<int> exp;
 
     if ( peek( Token::left_brace ) )
     {
@@ -480,12 +480,12 @@ Material *Parser::parseSpecularMaterial()
                 Kd.addFrame(time, parseReal());
             else if ( peek( "Ka" ) )
                 Ka.addFrame(time, parseReal());
-            else if ( peek( "Ks" ) )
-                Ks.addFrame(time, parseReal());
             else if ( peek( "Kr" ) )
                 Kr.addFrame(time, parseReal());
-            else if ( peek( "exp" ) )
-                exp.addFrame(time, parseReal());
+            else if ( peek( "exp" ) || peek( "exponent" ))
+                exp.addFrame(time, parseInteger());
+            else if ( peek( "highlight" ) )
+                highlight.addFrame(time, parseColor());
             else if ( peek( "time" ) )
             {
                 time = parseInteger();
@@ -494,61 +494,56 @@ Material *Parser::parseSpecularMaterial()
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `exp', `time' or }." );
+                throwParseException( "Expected `color', `Kd', `Ka', `Kr', `exp', `time' or }." );
         }
     }
 
+    if(highlight.isEmpty())
+        highlight.addFrame(0, Color(1.0, 1.0, 1.0));
     if(Kd.isEmpty())
         Kd.addFrame(0, 0.6);
     if(Ka.isEmpty())
         Ka.addFrame(0, 0.3);
-    if(Ks.isEmpty())
-        Ks.addFrame(0, 0.5);
     if(Kr.isEmpty())
         Kr.addFrame(0, 0.0);
     if(exp.isEmpty())
-        exp.addFrame(0, 50.0);
+        exp.addFrame(0, 50);
 
-    return new SpecularMaterial( color, Kd, Ka, Ks, Kr, exp );
+    return new SpecularMaterial( color, highlight, Kd, Ka, Kr, exp );
 }
 
 Material *Parser::parseRefractionMaterial()
 {
-    Color color( 1.0, 1.0, 1.0 );
-    double Kd = 0.6;
-    double Ka = 0.3;
-    double Ks = 0.5;
-    double Kr = 0.0;
-    double exp = 50.0;
-    double Krefr = 0.9;
-    double refr_index = 1.5;
+    int time = 0;
+    Animation<float> eta;
+    Animation<int> exp;
 
     if ( peek( Token::left_brace ) )
     {
         for ( ; ; )
         {
-            if ( peek( "color" ) )
-                color = parseColor();
-            else if ( peek( "Kd" ) )
-                Kd = parseReal();
-            else if ( peek( "Ka" ) )
-                Ka = parseReal();
-            else if ( peek( "Ks" ) )
-                Ks = parseReal();
-            else if ( peek( "Kr" ) )
-                Kr = parseReal();
-            else if ( peek( "Krefr" ) )
-                Krefr = parseReal();
-            else if ( peek( "refr_index" ) )
-                refr_index = parseReal();
+            if ( peek( "eta" ) )
+                eta.addFrame(time, parseReal());
+            else if ( peek( "exp" ) || peek( "exponent" ))
+                exp.addFrame(time,  parseInteger());
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `exp' or }." );
+                throwParseException( "Expected `eta', `exp', `time', or }." );
         }
     }
 
-    return new RefractionMaterial( color, Kd, Ka, Ks, Kr, exp, Krefr, refr_index );
+    if(eta.isEmpty())
+        eta.addFrame(0, 1. / 1.33);
+    if(exp.isEmpty())
+        exp.addFrame(0, 50);
+
+    return new RefractionMaterial( eta, exp );
 }
 
 Material *Parser::parseMetalMaterial()
@@ -563,7 +558,7 @@ Material *Parser::parseMetalMaterial()
         {
             if ( peek( "color" ) )
                 color.addFrame(time, parseReal());
-            else if ( peek( "exp" ) )
+            else if ( peek( "exp" ) || peek( "exponent" ))
                 exp.addFrame(time, parseInteger());
             else if ( peek( Token::right_brace ) )
                 break;
@@ -573,7 +568,7 @@ Material *Parser::parseMetalMaterial()
                 max_time = max(time, max_time);
             }
             else
-                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `exp' or }." );
+                throwParseException( "Expected `color', `Kd', `Ka', `Kr', `exp' or }." );
         }
     }
 
@@ -589,9 +584,9 @@ Material *Parser::parseMaterial()
 {
     if ( peek( "lambertian" ) )
       return parseLambertianMaterial();
-    else if ( peek( "specular" ) )
+    else if ( peek( "specular" ) || peek( "phong" ))
         return parseSpecularMaterial();
-    else if ( peek( "refraction" ) )
+    else if ( peek( "refraction" ) || peek( "dielectric") )
         return parseRefractionMaterial();
     else if ( peek( "metal" ) )
         return parseMetalMaterial();
@@ -732,9 +727,9 @@ Object *Parser::parseBoxObject()
         {
             if ( peek( "material" ) )
                 material = parseMaterial();
-            else if ( peek( "min" ) )
+            else if ( peek( "min" ) || peek( "corner1") )
                 min.addFrame(time, parsePoint());
-            else if ( peek( "max" ) )
+            else if ( peek( "max" ) || peek( "corner2") )
                 _max.addFrame((double)time, parsePoint());
             else if ( peek( "time" ) )
             {
@@ -768,7 +763,7 @@ Object *Parser::parseRingObject()
                 material = parseMaterial();
             else if ( peek( "normal" ) )
                 normal = parseVector();
-            else if ( peek( "radius" ) )
+            else if ( peek( "radius" ) || peek( "radius1") )
                 radius = parseReal();
             else if ( peek( "radius2" ) )
                 radius2 = parseReal();
