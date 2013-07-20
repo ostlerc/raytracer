@@ -12,7 +12,7 @@ motion blur
 depth of field
 indirect lighting ?
 soft shadows
-glossy reflection
+glossy reflection (jitter reflected rays or normal)
 
 #my ideas
 hierarchical modeling (rotation, translation, scaling)
