@@ -1,6 +1,7 @@
 #include "Sphere.h"
 #include "BoundingBox.h"
 #include "RenderContext.h"
+#include "Material.h"
 #include "HitRecord.h"
 #include "Point.h"
 #include "Ray.h"
@@ -22,6 +23,7 @@ void Sphere::preprocess(int maxTime)
         inv_radius.addFrame(i, 1./radius(i));
 
     inv_radius.preprocess(maxTime);
+    matl->preprocess(maxTime);
 }
 
 void Sphere::getBounds(BoundingBox& bbox, const RenderContext& context) const

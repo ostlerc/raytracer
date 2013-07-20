@@ -75,6 +75,8 @@ class Parser {
 
   Material *parseLambertianMaterial();
   Material *parseSpecularMaterial();
+  Material *parseRefractionMaterial();
+  Material *parseMetalMaterial();
   Material *parseMaterial();
 
   Object *parseGroupObject();

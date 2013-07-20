@@ -21,7 +21,7 @@ void Group::preprocess(int maxTime)
   Object*const* begin = &objects[0];
   Object*const* end = &objects[0]+objects.size();
   while (begin != end)
-    (*begin++)->preprocess(maxTime);
+      (*begin++)->preprocess(maxTime);
 }
 
 void Group::getBounds(BoundingBox& bbox, const RenderContext& context) const

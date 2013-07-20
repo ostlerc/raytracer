@@ -3,6 +3,8 @@
 #include "Group.h"
 #include "Image.h"
 #include "LambertianMaterial.h"
+#include "RefractionMaterial.h"
+#include "MetalMaterial.h"
 #include "Parser.h"
 #include "PinholeCamera.h"
 #include "Disc.h"
@@ -460,12 +462,66 @@ Material *Parser::parseLambertianMaterial()
 
 Material *Parser::parseSpecularMaterial()
 {
+    int time = 0;
+    Color color( 1.0, 1.0, 1.0 );
+    Animation<float> Kd;
+    Animation<float> Ka;
+    Animation<float> Ks;
+    Animation<float> Kr;
+    Animation<float> exp;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "color" ) )
+                color = parseColor();
+            else if ( peek( "Kd" ) )
+                Kd.addFrame(time, parseReal());
+            else if ( peek( "Ka" ) )
+                Ka.addFrame(time, parseReal());
+            else if ( peek( "Ks" ) )
+                Ks.addFrame(time, parseReal());
+            else if ( peek( "Kr" ) )
+                Kr.addFrame(time, parseReal());
+            else if ( peek( "exp" ) )
+                exp.addFrame(time, parseReal());
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `exp', `time' or }." );
+        }
+    }
+
+    if(Kd.isEmpty())
+        Kd.addFrame(0, 0.6);
+    if(Ka.isEmpty())
+        Ka.addFrame(0, 0.3);
+    if(Ks.isEmpty())
+        Ks.addFrame(0, 0.5);
+    if(Kr.isEmpty())
+        Kr.addFrame(0, 0.0);
+    if(exp.isEmpty())
+        exp.addFrame(0, 50.0);
+
+    return new SpecularMaterial( color, Kd, Ka, Ks, Kr, exp );
+}
+
+Material *Parser::parseRefractionMaterial()
+{
     Color color( 1.0, 1.0, 1.0 );
     double Kd = 0.6;
     double Ka = 0.3;
     double Ks = 0.5;
     double Kr = 0.0;
     double exp = 50.0;
+    double Krefr = 0.9;
+    double refr_index = 1.5;
 
     if ( peek( Token::left_brace ) )
     {
@@ -481,6 +537,10 @@ Material *Parser::parseSpecularMaterial()
                 Ks = parseReal();
             else if ( peek( "Kr" ) )
                 Kr = parseReal();
+            else if ( peek( "Krefr" ) )
+                Krefr = parseReal();
+            else if ( peek( "refr_index" ) )
+                refr_index = parseReal();
             else if ( peek( Token::right_brace ) )
                 break;
             else
@@ -488,7 +548,41 @@ Material *Parser::parseSpecularMaterial()
         }
     }
 
-    return new SpecularMaterial( color, Kd, Ka, Ks, Kr, exp );
+    return new RefractionMaterial( color, Kd, Ka, Ks, Kr, exp, Krefr, refr_index );
+}
+
+Material *Parser::parseMetalMaterial()
+{
+    int time = 0;
+    Animation<float> color;
+    Animation<int> exp;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "color" ) )
+                color.addFrame(time, parseReal());
+            else if ( peek( "exp" ) )
+                exp.addFrame(time, parseInteger());
+            else if ( peek( Token::right_brace ) )
+                break;
+            else if ( peek( "time" ) )
+            {
+                time = parseInteger();
+                max_time = max(time, max_time);
+            }
+            else
+                throwParseException( "Expected `color', `Kd', `Ka' `Ks' `Kr', `exp' or }." );
+        }
+    }
+
+    if(color.isEmpty())
+        color.addFrame(0, 0.0);
+    if(exp.isEmpty())
+        exp.addFrame(0, 50);
+
+    return new MetalMaterial( color, exp );
 }
 
 Material *Parser::parseMaterial()
@@ -497,6 +591,10 @@ Material *Parser::parseMaterial()
       return parseLambertianMaterial();
     else if ( peek( "specular" ) )
         return parseSpecularMaterial();
+    else if ( peek( "refraction" ) )
+        return parseRefractionMaterial();
+    else if ( peek( "metal" ) )
+        return parseMetalMaterial();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Material * >::iterator found = defined_materials.find( parseString() );

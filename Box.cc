@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "BoundingBox.h"
 #include "RenderContext.h"
+#include "Material.h"
 #include "HitRecord.h"
 #include "Point.h"
 #include "Ray.h"
@@ -26,6 +27,7 @@ void Box::preprocess(int maxTime)
     {
         _pairs[i] = PointPair(min(i), max(i));
     }
+    matl->preprocess(maxTime);
 }
 
 void Box::getBounds(BoundingBox& bbox, const RenderContext& context) const

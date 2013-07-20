@@ -1,6 +1,7 @@
 #include "Triangle.h"
 #include "BoundingBox.h"
 #include "HitRecord.h"
+#include "Material.h"
 #include "RenderContext.h"
 #include "Point.h"
 #include "Ray.h"
@@ -37,6 +38,7 @@ void Triangle::preprocess(int maxTime)
         }
     }
     n.preprocess(maxTime);
+    matl->preprocess(maxTime);
 }
 
 void Triangle::getBounds(BoundingBox& bbox, const RenderContext& context) const
