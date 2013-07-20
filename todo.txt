@@ -1,5 +1,3 @@
-dieletrics
-anti-aliasing (sampling)
 image to texture mapping
 color bleeding
 bounding box optimizations
@@ -17,7 +15,6 @@ glossy reflection (jitter reflected rays or normal)
 #my ideas
 hierarchical modeling (rotation, translation, scaling)
 global scaling
-soft shadows
 fog
 
 intersection solids (like death star)
@@ -40,3 +37,5 @@ reflections [done]
 animations + ffmpeg movie [done]
 camera move [done]
 threaded [done]
+anti-aliasing (sampling) [done, could be extracted into a class]
+dieletrics [done maybe with a bug?]

@@ -68,7 +68,7 @@ void Scene::render(int time)
     const double xmin = -1. + dx/2.;
     const double dy = 2./yres;
     const double ymin = -1. + dy/2.;
-    const int jitter_size = 8;
+    const int jitter_size = 9;
     const double jdx = 2./(xres*jitter_size);
     const double jdy = 2./(yres*jitter_size);
     //const double jxmin = -1 + jdx/2.;
