@@ -1,9 +1,11 @@
 #include "Ring.h"
 #include "HitRecord.h"
+#include "BoundingBox.h"
 #include "Math.h"
 #include "Ray.h"
 #include <iostream>
 #include <stdlib.h>
+#include <utility>
 using namespace std;
 
 Ring::Ring(Material* material, const Vector& normal, double r, double r2, const Point& q)
@@ -11,6 +13,8 @@ Ring::Ring(Material* material, const Vector& normal, double r, double r2, const 
 {
     n.normalize();
     d = Dot(n, q);
+    if(r > r2)
+        swap(r,r2);
 }
 
 Ring::~Ring()
@@ -39,6 +43,11 @@ void Ring::normal(Vector& normal, const RenderContext&,
 
 void Ring::getBounds(BoundingBox& bbox, const RenderContext&) const
 {
-    //TODO:
+    //double time = context.time();
+    double radiusT = Max(r,r2);//(time);
+    Point centerT = q;//(time);
+    Vector diag(radiusT, radiusT, radiusT);
+    bbox.extend(centerT+diag);
+    bbox.extend(centerT-diag);
 }
 

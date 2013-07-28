@@ -43,6 +43,9 @@ class Point {
     return data[2];
   }
 
+  double length() const {
+      return sqrt(data[0]*data[0]+data[1]*data[1]+data[2]*data[2]);
+  }
   Vector operator-(const Point& p) const {
     return Vector(data[0]-p.data[0], data[1]-p.data[1], data[2]-p.data[2]);
   }

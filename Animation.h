@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
+#include <signal.h>
 
 template<typename ValueType>
 class Animation
@@ -57,9 +58,13 @@ public:
 
     void preprocess(int maxTime)
     {
-        if(maxTime < 0) exit(1);
+        if(maxTime < 0) raise(6);
+
+        if(values.size() == (unsigned)maxTime+1) //don't double preprocess
+            return;
 
         values.resize(maxTime+1);
+
         for(int i = 0; i <= maxTime; i++)
         {
             auto item = std::find(map.begin(), map.end(), (double)i);

@@ -505,7 +505,7 @@ Material *Parser::parseSpecularMaterial()
     if(Ka.isEmpty())
         Ka.addFrame(0, 0.3);
     if(Kr.isEmpty())
-        Kr.addFrame(0, 0.0);
+        Kr.addFrame(0, 0.3);
     if(exp.isEmpty())
         exp.addFrame(0, 50);
 
@@ -568,7 +568,7 @@ Material *Parser::parseMetalMaterial()
                 max_time = max(time, max_time);
             }
             else
-                throwParseException( "Expected `color', `Kd', `Ka', `Kr', `exp' or }." );
+                throwParseException( "Expected `color', `exp' or }." );
         }
     }
 

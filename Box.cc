@@ -38,36 +38,12 @@ void Box::getBounds(BoundingBox& bbox, const RenderContext& context) const
 
 void Box::intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const
 {
-    // Optimized Smits’ method
-    // http://people.csail.mit.edu/amy/papers/box-jgt.pdf
-    const PointPair& bounds = _pairs[context.time()];
-    int sign[3];
+    double tmin;
+    BoundingBox bbox;
+    getBounds(bbox, context);
 
-    sign[0] = (ray.inv_direction().x() < 0.);
-    sign[1] = (ray.inv_direction().y() < 0.);
-    sign[2] = (ray.inv_direction().z() < 0.);
-
-    float tmin, tmax, tymin, tymax, tzmin, tzmax;
-    tmin = (bounds[sign[0]].x() - ray.origin().x()) * ray.inv_direction().x();
-    tmax = (bounds[1-sign[0]].x() - ray.origin().x()) * ray.inv_direction().x();
-    tymin = (bounds[sign[1]].y() - ray.origin().y()) * ray.inv_direction().y();
-    tymax = (bounds[1-sign[1]].y() - ray.origin().y()) * ray.inv_direction().y();
-    if ( (tmin > tymax) || (tymin > tmax) )
-        return;
-    if (tymin > tmin)
-        tmin = tymin;
-    if (tymax < tmax)
-        tmax = tymax;
-    tzmin = (bounds[sign[2]].z() - ray.origin().z()) * ray.inv_direction().z();
-    tzmax = (bounds[1-sign[2]].z() - ray.origin().z()) * ray.inv_direction().z();
-    if ( (tmin > tzmax) || (tzmin > tmax) )
-        return;
-    if (tzmin > tmin)
-        tmin = tzmin;
-    if (tzmax < tmax)
-        tmax = tzmax;
-
-    hit.hit(tmin, this, matl);
+    if(bbox.intersects(ray, tmin))
+        hit.hit(tmin, this, matl);
 }
 
 void Box::normal(Vector& normal, const RenderContext& context, const Point& hitpos,

@@ -16,6 +16,7 @@ class Object {
   virtual void preprocess(int maxTime);
   virtual void getBounds(BoundingBox& bbox, const RenderContext&) const = 0;
   virtual void intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const = 0;
+  virtual bool isInfinite() { return false; }
 
  private:
   Object(const Object&);

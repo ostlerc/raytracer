@@ -1,5 +1,6 @@
 #include "Disc.h"
 #include "HitRecord.h"
+#include "BoundingBox.h"
 #include "Math.h"
 #include "Ray.h"
 #include <iostream>
@@ -36,6 +37,11 @@ void Disc::normal(Vector& normal, const RenderContext&,
 
 void Disc::getBounds(BoundingBox& bbox, const RenderContext&) const
 {
-    //TODO:
+    //double time = context.time();
+    double radiusT = r;//(time);
+    Point centerT = q;//(time);
+    Vector diag(radiusT, radiusT, radiusT);
+    bbox.extend(centerT+diag);
+    bbox.extend(centerT-diag);
 }
 

@@ -3,6 +3,7 @@
 #define Group_h
 
 #include "Object.h"
+#include "BoundingBox.h"
 #include <vector>
 
 class Group : public Object {
@@ -17,10 +18,20 @@ class Group : public Object {
 
  protected:
   std::vector<Object*> objects;
+  std::vector<Object*> infiniteObjects;
+
+  //This holds the recursive bvh for all objects this item holds
+  std::vector<std::vector<Object*>> groups;
+
+ private:
+  void _populateBVH(int maxTime);
+  std::vector<Object*> _pairObjects(std::vector<Object*> objectsRemaining, RenderContext&);
+  std::vector<BoundingBox> _bounds;
 
  private:
   Group(const Group&);
   Group& operator=(const Group&);
+  BoundingBox bb1, bb2;
 };
 
 #endif
