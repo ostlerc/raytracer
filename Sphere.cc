@@ -19,8 +19,11 @@ void Sphere::preprocess(int maxTime)
     center.preprocess(maxTime);
     radius.preprocess(maxTime);
 
-    for(int i = 0; i <= maxTime; i++)
-        inv_radius.addFrame(i, 1./radius(i));
+    if(inv_radius.isEmpty())
+    {
+        for(int i = 0; i <= maxTime; i++)
+            inv_radius.addFrame(i, 1./radius(i));
+    }
 
     inv_radius.preprocess(maxTime);
     matl->preprocess(maxTime);

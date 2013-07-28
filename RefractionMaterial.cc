@@ -92,8 +92,6 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
 
     if(depth < scene->getMaxRayDepth())
     {
-        if(eta.isEmpty())
-            cerr << "uh oh" << endl;
         double _eta = inside ? 1. / eta(time) : eta(time);
 
         Vector rDir = ray.direction() + 2.*costheta * normal;
@@ -106,7 +104,6 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
         if (costheta2sqrd < 0.) //total internal reflection
         {
             double t = scene->traceRay(reflect_color, context, reflectionRay, atten, depth+1);
-            //result += reflect_color;
             result += reflect_color*beersAttenuation(t, context.time());
         }
         else
@@ -142,7 +139,6 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
                 // transmit goes inside
                 result += refraction_color*beersAttenuation(_t, context.time())*fresnel_refract;
             }
-            //result += reflect_color*fresnel_reflect + refraction_color*fresnel_refract;
         }
     }
 }
