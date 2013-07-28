@@ -688,11 +688,11 @@ Object *Parser::parseTriangleObject()
         {
             if ( peek( "material" ) )
                 material = parseMaterial();
-            else if ( peek( "p1" ) )
+            else if ( peek( "p1" ) || peek( "corner1") )
                 p1.addFrame((double)time, parsePoint());
-            else if ( peek( "p2" ) )
+            else if ( peek( "p2" ) || peek( "corner2") )
                 p2.addFrame((double)time, parsePoint());
-            else if ( peek( "p3" ) )
+            else if ( peek( "p3" ) || peek( "corner3") )
                 p3.addFrame((double)time, parsePoint());
             else if ( peek( "normal" ) )
             {
@@ -821,7 +821,7 @@ Object *Parser::parseObject()
         return parseTriangleObject();
     else if ( peek( "box" ) )
         return parseBoxObject();
-    else if ( peek( "disc" ) )
+    else if ( peek( "disc" ) || peek( "disk" ))
         return parseDiscObject();
     else if ( peek( "ring" ) )
         return parseRingObject();

@@ -58,7 +58,7 @@ void Box::normal(Vector& normal, const RenderContext& context, const Point& hitp
     const Vector& localMin = (hitpos - min(time)).absoluteValue();
     const Vector& localMax = (hitpos - max(time)).absoluteValue();
 
-    const double e = .00001;
+    const double e = .001;
 
     //x normals
     if(localMin.x() < e)

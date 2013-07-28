@@ -151,6 +151,7 @@ void Group::intersect(HitRecord& hit, const RenderContext& context, const Ray& r
             (*begin++)->intersect(hit, context, ray);
     }
 
+    //comment out these three lines to disable the bvh optimization
     double tmin, tmax;
     if(!_bounds[context.time()].intersects(ray, tmin, tmax))
         return;
