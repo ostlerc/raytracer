@@ -74,6 +74,12 @@ class Scene {
   void setMinAttenuation(double atten) {
     minAttenuation = atten;
   }
+  int getSampleSize() const {
+      return sampleSize;
+  }
+  void setSampleSize(int ss) {
+      sampleSize = ss;
+  }
 
   void preprocess(int maxTime);
   void render(int time);
@@ -91,6 +97,7 @@ class Scene {
   Object* object;
   std::vector<Light*> lights;
   int maxRayDepth;
+  int sampleSize;
   double minAttenuation;
 
 };

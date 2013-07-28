@@ -22,7 +22,7 @@ class BoundingBox {
     return max;
   }
 
-  bool intersects(const Ray& ray, double& tmin) const;
+  bool intersects(const Ray& ray, double& tmin, double& tmax) const;
 
   double distance(BoundingBox& bb);
   double distance(double p1, double p2);

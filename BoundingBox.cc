@@ -24,7 +24,7 @@ void BoundingBox::extend(const BoundingBox &bb)
     max = Max(bb.max, max);
 }
 
-bool BoundingBox::intersects(const Ray& ray, double& tmin) const
+bool BoundingBox::intersects(const Ray& ray, double& tmin, double& tmax) const
 {
     // Optimized Smits’ method
     // http://people.csail.mit.edu/amy/papers/box-jgt.pdf
@@ -35,7 +35,7 @@ bool BoundingBox::intersects(const Ray& ray, double& tmin) const
     sign[1] = (ray.inv_direction().y() < 0.);
     sign[2] = (ray.inv_direction().z() < 0.);
 
-    float tmax, tymin, tymax, tzmin, tzmax;
+    float tymin, tymax, tzmin, tzmax;
     tmin = (bounds[sign[0]].x() - ray.origin().x()) * ray.inv_direction().x();
     tmax = (bounds[1-sign[0]].x() - ray.origin().x()) * ray.inv_direction().x();
     tymin = (bounds[sign[1]].y() - ray.origin().y()) * ray.inv_direction().y();
@@ -52,6 +52,8 @@ bool BoundingBox::intersects(const Ray& ray, double& tmin) const
         return false;
     if (tzmin > tmin)
         tmin = tzmin;
+    if (tzmax < tmax)
+        tmax = tzmax;
 
     return true;
 }

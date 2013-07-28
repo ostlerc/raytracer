@@ -13,8 +13,8 @@
 
 using namespace std;
 
-RefractionMaterial::RefractionMaterial(Animation<float> eta, Animation<int> exp)
-:eta(eta), exp(exp)
+RefractionMaterial::RefractionMaterial(Animation<float> eta, Animation<int> exponent, Animation<Color> atten)
+:eta(eta), exponent(exponent), atten(atten)
 {
 }
 
@@ -25,7 +25,14 @@ RefractionMaterial::~RefractionMaterial()
 void RefractionMaterial::preprocess(int maxTime)
 {
     eta.preprocess(maxTime);
-    exp.preprocess(maxTime);
+    exponent.preprocess(maxTime);
+    atten.preprocess(maxTime);
+
+    if(co.empty())
+    {
+        for(int t = 0; t <= maxTime; ++t)
+            co.push_back( Color(log(atten(t).r()), log(atten(t).g()), log(atten(t).b())) );
+    }
 }
 
 void RefractionMaterial::shade(Color& result, const RenderContext& context,
@@ -75,7 +82,7 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
                   : light_direction - ray.direction(); //halfway vector
 
                 h.normalize();
-                double s = pow( Dot(unflipped_normal, h), exp(time)); //Specular fraction
+                double s = pow( Dot(unflipped_normal, h), exponent(time)); //Specular fraction
                 c += light_color*s;
             }
         }
@@ -85,6 +92,8 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
 
     if(depth < scene->getMaxRayDepth())
     {
+        if(eta.isEmpty())
+            cerr << "uh oh" << endl;
         double _eta = inside ? 1. / eta(time) : eta(time);
 
         Vector rDir = ray.direction() + 2.*costheta * normal;
@@ -96,8 +105,9 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
 
         if (costheta2sqrd < 0.) //total internal reflection
         {
-            scene->traceRay(reflect_color, context, reflectionRay, atten, depth+1);
-            result += reflect_color;
+            double t = scene->traceRay(reflect_color, context, reflectionRay, atten, depth+1);
+            //result += reflect_color;
+            result += reflect_color*beersAttenuation(t, context.time());
         }
         else
         {
@@ -114,10 +124,33 @@ void RefractionMaterial::shade(Color& result, const RenderContext& context,
             Ray refractionRay(hitpos, refract_dir);
 
             Color refraction_color;
-            scene->traceRay(reflect_color, context, reflectionRay, atten*fresnel_reflect, depth+1);
-            scene->traceRay(refraction_color, context, refractionRay, atten*fresnel_refract, depth+1);
+            double t  = scene->traceRay(reflect_color, context, reflectionRay, atten*fresnel_reflect, depth+1);
+            double _t = scene->traceRay(refraction_color, context, refractionRay, atten*fresnel_refract, depth+1);
 
-            result += reflect_color*fresnel_reflect + refraction_color*fresnel_refract;
+
+            if(inside)
+            {
+                // reflect back inside
+                result += reflect_color*beersAttenuation(t, context.time())*fresnel_reflect;
+                // transmit to the outside
+                result += refraction_color*fresnel_refract;
+            }
+            else
+            {
+                // reflect back outside
+                result += reflect_color*fresnel_reflect;
+                // transmit goes inside
+                result += refraction_color*beersAttenuation(_t, context.time())*fresnel_refract;
+            }
+            //result += reflect_color*fresnel_reflect + refraction_color*fresnel_refract;
         }
     }
+}
+
+Color RefractionMaterial::beersAttenuation(double t, int time) const
+{
+    return Color(
+            exp( t*co[time].r() ),
+            exp( t*co[time].g() ),
+            exp( t*co[time].b() ) );
 }

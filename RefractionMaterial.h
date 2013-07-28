@@ -7,7 +7,7 @@
 
 class RefractionMaterial : public Material {
     public:
-        RefractionMaterial(Animation<float> eta, Animation<int> exp);
+        RefractionMaterial(Animation<float> eta, Animation<int> exponent, Animation<Color> atten);
         virtual ~RefractionMaterial();
 
         virtual void shade(Color& result, const RenderContext& context, const Ray& ray,
@@ -18,9 +18,13 @@ class RefractionMaterial : public Material {
     private:
         RefractionMaterial(const RefractionMaterial&);
         RefractionMaterial& operator=(const RefractionMaterial&);
+        Color beersAttenuation(double t, int time) const;
 
         Animation<float> eta; //this is the ratio kifrom / kito. ( ie 1. / 1.33 )
-        Animation<int> exp; //specular exponent
+        Animation<int> exponent; //specular exponent
+
+        Animation<Color> atten; //attenuation of this object
+        std::vector<Color> co; //coefficient (beers attenuation)
 };
 
 #endif //RefractionMaterial_h

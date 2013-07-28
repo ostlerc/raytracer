@@ -38,12 +38,13 @@ void Box::getBounds(BoundingBox& bbox, const RenderContext& context) const
 
 void Box::intersect(HitRecord& hit, const RenderContext& context, const Ray& ray) const
 {
-    double tmin;
+    double tmin, tmax;
     BoundingBox bbox;
     getBounds(bbox, context);
 
-    if(bbox.intersects(ray, tmin))
-        hit.hit(tmin, this, matl);
+    if(bbox.intersects(ray, tmin, tmax))
+        if(!hit.hit(tmin, this, matl))
+            hit.hit(tmax, this, matl);
 }
 
 void Box::normal(Vector& normal, const RenderContext& context, const Point& hitpos,
@@ -57,7 +58,7 @@ void Box::normal(Vector& normal, const RenderContext& context, const Point& hitp
     const Vector& localMin = (hitpos - min(time)).absoluteValue();
     const Vector& localMax = (hitpos - max(time)).absoluteValue();
 
-    const double e = .001;
+    const double e = .00001;
 
     //x normals
     if(localMin.x() < e)

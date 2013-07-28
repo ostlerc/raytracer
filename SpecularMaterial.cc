@@ -75,8 +75,6 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
         }
     }
 
-    result = specular*highlight(time) + light*color;
-
     if(depth < context.getScene()->getMaxRayDepth() && Kr(time) > 0.)
     {
         double reflet = 2. * Dot(ray.direction(), normal);
@@ -86,6 +84,9 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
         Color rcolor;
         scene->traceRay(rcolor, context, reflection, atten, depth+1);
 
-        result += rcolor * Kr(time);
+        light += rcolor * Kr(time);
     }
+
+    result = specular*highlight(time) + light*color;
+
 }

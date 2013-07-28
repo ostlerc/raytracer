@@ -505,7 +505,7 @@ Material *Parser::parseSpecularMaterial()
     if(Ka.isEmpty())
         Ka.addFrame(0, 0.3);
     if(Kr.isEmpty())
-        Kr.addFrame(0, 0.3);
+        Kr.addFrame(0, 0.4);
     if(exp.isEmpty())
         exp.addFrame(0, 50);
 
@@ -517,6 +517,7 @@ Material *Parser::parseRefractionMaterial()
     int time = 0;
     Animation<float> eta;
     Animation<int> exp;
+    Animation<Color> atten;
 
     if ( peek( Token::left_brace ) )
     {
@@ -526,6 +527,8 @@ Material *Parser::parseRefractionMaterial()
                 eta.addFrame(time, parseReal());
             else if ( peek( "exp" ) || peek( "exponent" ))
                 exp.addFrame(time,  parseInteger());
+            else if ( peek( "attenuation" ) )
+                atten.addFrame(time, parseColor());
             else if ( peek( "time" ) )
             {
                 time = parseInteger();
@@ -534,7 +537,7 @@ Material *Parser::parseRefractionMaterial()
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `eta', `exp', `time', or }." );
+                throwParseException( "Expected `eta', `exp', `attenuation', `time', or }." );
         }
     }
 
@@ -542,8 +545,10 @@ Material *Parser::parseRefractionMaterial()
         eta.addFrame(0, 1. / 1.33);
     if(exp.isEmpty())
         exp.addFrame(0, 50);
+    if(atten.isEmpty())
+        atten.addFrame(0, Color(1.,1.,1.));
 
-    return new RefractionMaterial( eta, exp );
+    return new RefractionMaterial( eta, exp, atten );
 }
 
 Material *Parser::parseMetalMaterial()
@@ -857,6 +862,8 @@ Scene *Parser::parseScene(
       yres = parseInteger();
     else if ( peek( "maxraydepth" ) )
       scene->setMaxRayDepth( parseInteger() );
+    else if ( peek( "samplesize" ) )
+        scene->setSampleSize( parseInteger() );
     else if ( peek( "minattenuation" ) )
       scene->setMinAttenuation( parseReal() );
     else if ( peek( "camera" ) )
@@ -882,7 +889,7 @@ Scene *Parser::parseScene(
     else if ( peek( Token::end_of_file ) )
         break;
     else
-        throwParseException( "Expected `filename', `xres', `yres', `maxraydepth', `minattenuation', "
+        throwParseException( "Expected `filename', `xres', `yres', `maxraydepth', `sampleSize', `minattenuation', "
                              "`camera', `background', `ambient', `light', `scene', or `define'." );
   }
 
