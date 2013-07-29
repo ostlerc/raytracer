@@ -42,6 +42,7 @@ int main(int argc, char** argv)
 
     scene->preprocess(reader.maxTime());
 
+    cerr << "Preprocessing time:\t\t" << setprecision(3) << t2-t1 << " seconds\n";
     cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << " jitter sample size=" << scene->getSampleSize() << endl;
 
     double t2 = Time::currentSeconds();
@@ -69,7 +70,6 @@ int main(int argc, char** argv)
     cerr << endl;
 
     double t3 = Time::currentSeconds();
-    cerr << "Setup/load time:\t\t" << setprecision(3) << t2-t1 << " seconds\n";
     cerr << "Render/Write to disk time:\t" << setprecision(3) << t3-t2 << " seconds\n";
     return 0;
 }

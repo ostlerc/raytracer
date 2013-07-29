@@ -1,4 +1,3 @@
-import models
 image to texture mapping
 color bleeding
 some new scenes
@@ -39,3 +38,4 @@ dieletrics [done]
 bounding box optimizations [done]
 perlin noise [done]
 stripes [done]
+import models [done, slow to preprocess though]
