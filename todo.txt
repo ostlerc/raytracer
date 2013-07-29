@@ -1,6 +1,6 @@
+import models
 image to texture mapping
 color bleeding
-import models
 some new scenes
 get rid of shadow rays
 motion blur
