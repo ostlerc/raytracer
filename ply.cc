@@ -10,9 +10,9 @@ namespace ply
 {
     int vertex_cb(p_ply_argument argument)
     {
-        std::vector<double> *v = NULL;
+        std::vector<long double> *v = NULL;
         ply_get_argument_user_data(argument, (void**)&v, NULL);
-        double d = ply_get_argument_value(argument);
+        long double d = ply_get_argument_value(argument);
         v->push_back(d);
 
         return 1;
@@ -67,7 +67,7 @@ namespace ply
         return f;
     }
 
-    double area(Vector a, Vector b, Vector c)
+    long double area(Vector a, Vector b, Vector c)
     {
         Vector e1(b.x() - a.x(), b.y()- a.y(), b.z() - a.z());
         Vector e2(c.x() - a.x(), c.y()- a.y(), c.z() - a.z());
@@ -75,7 +75,7 @@ namespace ply
         return e3.length() / 2.0;
     }
 
-    std::vector<double> plyFile::getNormals()
+    std::vector<long double> plyFile::getNormals()
     {
         if(_vertices.size() == 0 || _elements.size() == 0)
         {
@@ -105,14 +105,14 @@ namespace ply
         //loop through faces, calculate normals, add normals to vertex normals
         for(unsigned i = 0; i < _elements.size(); i+=3)
         {
-            double j = _elements[i];
-            double k = _elements[i+1];
-            double l = _elements[i+2];
+            long double j = _elements[i];
+            long double k = _elements[i+1];
+            long double l = _elements[i+2];
 
             Vector a = vertex(k) - vertex(j);
             Vector b = vertex(l) - vertex(k);
 
-            double _area = area(vertex(j), vertex(k), vertex(l));
+            long double _area = area(vertex(j), vertex(k), vertex(l));
 
             Vector faceNormal = Cross(a,b)*_area;
 
@@ -142,4 +142,14 @@ namespace ply
         i*=3;
         return Vector(_vertices[i], _vertices[i+1], _vertices[i+2]);
     }
+
+    Vector plyFile::normal(int i)
+    {
+        if(!_normals.size())
+            getNormals();
+
+        i*=3;
+        return Vector(_normals[i], _normals[i+1], _normals[i+2]);
+    }
+
 }

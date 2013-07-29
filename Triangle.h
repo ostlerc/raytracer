@@ -14,6 +14,12 @@ class Triangle : public Primitive {
                 Animation<Point>& p1,
                 Animation<Point>& p2,
                 Animation<Vector>& n);
+
+        Triangle(Material* material,
+                Point& p0,
+                Point& p1,
+                Point& p2,
+                Vector& n);
         virtual ~Triangle();
 
         virtual void getBounds(BoundingBox& bbox, const RenderContext&) const;

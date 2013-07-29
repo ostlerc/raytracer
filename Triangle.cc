@@ -19,6 +19,14 @@ Triangle::Triangle(Material* material, Animation<Point>& p0, Animation<Point>& p
 {
 }
 
+Triangle::Triangle(Material* material, Point& _p0, Point& _p1, Point& _p2, Vector& )
+    : Primitive(material)
+{
+    p0.addFrame(0, _p0);
+    p1.addFrame(0, _p1);
+    p2.addFrame(0, _p2);
+}
+
 Triangle::~Triangle()
 {
 }
@@ -68,7 +76,7 @@ void Triangle::intersect(HitRecord& hit, const RenderContext& context, const Ray
     h = Cross(ray.direction(), e2);
     a = Dot(e1, h);
 
-    if(a > -0.00001 && a < 0.00001)
+    if(a > -0.0000001 && a < 0.0000001)
         return;
 
     f = 1.0/a;

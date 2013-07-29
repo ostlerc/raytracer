@@ -13,20 +13,21 @@ namespace ply
     class plyFile
     {
         public:
-            std::vector<double> getVertices() { return _vertices; }
+            std::vector<long double> getVertices() { return _vertices; }
             std::vector<unsigned> getElements() { return _elements; }
 
-            std::vector<double> getNormals();
+            std::vector<long double> getNormals();
+
+            Vector normal(int i);
+            Vector vertex(int i);
 
             static plyFile parseFile(const char* fileName);
 
         private:
-            std::vector<double> _vertices;
+            std::vector<long double> _vertices;
             std::vector<unsigned> _elements;
 
-            std::vector<double> _normals;
-
-            Vector vertex(int i);
+            std::vector<long double> _normals;
     };
 }
 

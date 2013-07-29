@@ -17,6 +17,7 @@
 #include "SpecularMaterial.h"
 #include "Sphere.h"
 #include "Triangle.h"
+#include "ply.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -731,6 +732,65 @@ Object *Parser::parseSphereObject()
     return new Sphere( material, center, radius );
 }
 
+Object *Parser::parsePlyObject()
+{
+    Material *material = default_material;
+    std::string filename;
+    Vector translate(0,0,0);
+    Vector scale(1,1,1);
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "material" ) )
+                material = parseMaterial();
+            else if ( peek( "filename" ) )
+                filename = parseString();
+            else if ( peek( "scale" ) )
+                scale = parseVector();
+            else if ( peek( "translate" ) )
+                translate = parseVector();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material', `filename', `scale', `translate' or }." );
+        }
+    }
+
+    if(filename.empty())
+        throwParseException( "Missing: `filename'");
+
+    ply::plyFile file = ply::plyFile::parseFile(filename.c_str());
+
+    Group *g = new Group();
+
+    std::vector<unsigned> faces = file.getElements();
+
+    Point p1;
+    Point p2;
+    Point p3;
+    Vector normal;
+
+    if(faces.size() % 3 != 0)
+        throwParseException("expected exact triangles but this model doesn't have full triangles");
+
+    for(unsigned i = 0; i < faces.size(); i+=3)
+    {
+        p1 = (Point(file.vertex(faces[i])) + translate)*scale;
+        p2 = (Point(file.vertex(faces[i+1])) + translate)*scale;
+        p3 = (Point(file.vertex(faces[i+2])) + translate)*scale;
+
+        normal = file.normal(faces[i]);
+
+        g->addObject(new Triangle(material, p1, p2, p3, normal));
+    }
+
+    cout << "done parsing model file " << filename << " with " << faces.size() / 3. << " faces" << endl;
+
+    return g;
+}
+
 Object *Parser::parseTriangleObject()
 {
     Material *material = default_material;
@@ -872,18 +932,20 @@ Object *Parser::parseObject()
 {
     if ( peek( "group" ) )
         return parseGroupObject();
-    else if ( peek( "plane" ) )
-        return parsePlaneObject();
-    else if ( peek( "sphere" ) )
-        return parseSphereObject();
-    else if ( peek( "triangle" ) )
-        return parseTriangleObject();
     else if ( peek( "box" ) )
         return parseBoxObject();
     else if ( peek( "disc" ) || peek( "disk" ))
         return parseDiscObject();
+    else if ( peek( "plane" ) )
+        return parsePlaneObject();
+    else if ( peek( "plymodel" ) )
+        return parsePlyObject();
     else if ( peek( "ring" ) )
         return parseRingObject();
+    else if ( peek( "sphere" ) )
+        return parseSphereObject();
+    else if ( peek( "triangle" ) )
+        return parseTriangleObject();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Object * >::iterator found = defined_objects.find( parseString() );

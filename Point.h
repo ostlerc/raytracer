@@ -20,6 +20,12 @@ class Point {
     for(int i=0;i<3;i++)
       data[i] = copy.data[i];
   }
+
+  Point(const Vector& copy) {
+      data[0] = copy.x();
+      data[1] = copy.y();
+      data[2] = copy.z();
+  }
   //explicit Point(const Vector& copy) {
     //data[0] = copy.x(); data[1] = copy.y(); data[2] = copy.z();
   //}

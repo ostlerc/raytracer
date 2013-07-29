@@ -40,7 +40,7 @@ void Group::preprocess(int maxTime)
 
     RenderContext context(0, 0);
 
-    for(int time = 0; time <= maxTime; time++)
+    for(int time = 0; time <= maxTime; ++time)
     {
         context.setTime(time);
         BoundingBox bbox;

@@ -38,9 +38,11 @@ int main(int argc, char** argv)
     string filename;
     Scene *scene = reader.parseScene( filename );
 
-    cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << " jitter sample size=" << scene->getSampleSize() << endl;
+    cerr << "preprocessing scene..." << endl;
 
     scene->preprocess(reader.maxTime());
+
+    cerr << "rendering " << reader.maxTime()+1 << " frames with a max reflection depth of " << scene->getMaxRayDepth() << " jitter sample size=" << scene->getSampleSize() << endl;
 
     double t2 = Time::currentSeconds();
     for(int i = 0; i <= reader.maxTime(); i++)

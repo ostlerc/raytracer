@@ -81,13 +81,14 @@ class Parser {
   Material *parseSpecularMaterial();
   Material *parseMaterial();
 
-  Object *parseGroupObject();
-  Object *parsePlaneObject();
-  Object *parseSphereObject();
-  Object *parseTriangleObject();
   Object *parseBoxObject();
   Object *parseDiscObject();
+  Object *parseGroupObject();
+  Object *parsePlaneObject();
+  Object *parsePlyObject();
   Object *parseRingObject();
+  Object *parseSphereObject();
+  Object *parseTriangleObject();
   Object *parseObject();
 
   public:
