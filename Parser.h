@@ -73,10 +73,12 @@ class Parser {
   Light *parsePointLight();
   Light *parseLight();
 
+  Material *parseCheckeredMaterial();
   Material *parseLambertianMaterial();
-  Material *parseSpecularMaterial();
-  Material *parseRefractionMaterial();
   Material *parseMetalMaterial();
+  Material *parsePerlinMaterial();
+  Material *parseRefractionMaterial();
+  Material *parseSpecularMaterial();
   Material *parseMaterial();
 
   Object *parseGroupObject();

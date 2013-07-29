@@ -1,0 +1,10 @@
+Week 4:
+I have added attenuation to the refractions
+fixed some bugs with box collisions
+added a BVH struture that speeds up things pretty well. one test I had was the low res bunny scene, this took 70 seconds without the BVH but only 6 seconds with it.
+
+Future things:
+  import ply files
+  others listen in todo.txt
+
+  Time is running out, i'm hoping I can get a lot of the ideas done with the path tracing. But so far I havn't had time to make the leap for path tracing.

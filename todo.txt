@@ -1,11 +1,8 @@
 image to texture mapping
 color bleeding
-bounding box optimizations
 import models
 some new scenes
-checkered
 get rid of shadow rays
-perlin noise
 motion blur
 depth of field
 indirect lighting ?
@@ -38,4 +35,7 @@ animations + ffmpeg movie [done]
 camera move [done]
 threaded [done]
 anti-aliasing (sampling) [done, could be extracted into a class]
-dieletrics [done maybe with a bug?]
+dieletrics [done]
+bounding box optimizations [done]
+perlin noise [done]
+stripes [done]

@@ -1,16 +1,18 @@
 #include "Box.h"
+#include "CheckeredMaterial.h"
+#include "PerlinMaterial.h"
 #include "ConstantBackground.h"
+#include "Disc.h"
 #include "Group.h"
 #include "Image.h"
 #include "LambertianMaterial.h"
-#include "RefractionMaterial.h"
 #include "MetalMaterial.h"
 #include "Parser.h"
 #include "PinholeCamera.h"
-#include "Disc.h"
-#include "Ring.h"
 #include "Plane.h"
 #include "PointLight.h"
+#include "RefractionMaterial.h"
+#include "Ring.h"
 #include "Scene.h"
 #include "SpecularMaterial.h"
 #include "Sphere.h"
@@ -512,6 +514,59 @@ Material *Parser::parseSpecularMaterial()
     return new SpecularMaterial( color, highlight, Kd, Ka, Kr, exp );
 }
 
+
+Material *Parser::parseCheckeredMaterial()
+{
+    Material *m1 = 0;
+    Material *m2 = 0;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "material1" ) )
+                m1 = parseMaterial();
+            else if ( peek( "material2" ) )
+                m2 = parseMaterial();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material1', `material2', or }." );
+        }
+    }
+
+    if(!m1 || !m2)
+        throwParseException( "Expected `material1', `material2', or }." );
+
+    return new CheckeredMaterial( m1, m2 );
+}
+
+Material *Parser::parsePerlinMaterial()
+{
+    Material *m1 = 0;
+    Material *m2 = 0;
+
+    if ( peek( Token::left_brace ) )
+    {
+        for ( ; ; )
+        {
+            if ( peek( "material1" ) )
+                m1 = parseMaterial();
+            else if ( peek( "material2" ) )
+                m2 = parseMaterial();
+            else if ( peek( Token::right_brace ) )
+                break;
+            else
+                throwParseException( "Expected `material1', `material2', or }." );
+        }
+    }
+
+    if(!m1 || !m2)
+        throwParseException( "Expected `material1', `material2', or }." );
+
+    return new PerlinMaterial( m1, m2 );
+}
+
 Material *Parser::parseRefractionMaterial()
 {
     int time = 0;
@@ -593,8 +648,12 @@ Material *Parser::parseMaterial()
         return parseSpecularMaterial();
     else if ( peek( "refraction" ) || peek( "dielectric") )
         return parseRefractionMaterial();
+    else if ( peek( "checkered" ) )
+        return parseCheckeredMaterial();
     else if ( peek( "metal" ) )
         return parseMetalMaterial();
+    else if ( peek( "perlin" ) )
+        return parsePerlinMaterial();
     else if ( next_token.token_type == Token::string )
     {
         map< string, Material * >::iterator found = defined_materials.find( parseString() );
