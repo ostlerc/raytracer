@@ -1,5 +1,7 @@
 image to texture mapping
-color bleeding
+color bleeding (tracing?)
+bounding box optimizations
+import models
 some new scenes
 get rid of shadow rays
 motion blur
@@ -7,6 +9,7 @@ depth of field
 indirect lighting ?
 soft shadows
 glossy reflection (jitter reflected rays or normal)
+accostic
 
 #my ideas
 hierarchical modeling (rotation, translation, scaling)
@@ -21,7 +24,7 @@ volume costic ? beams of light through dusty room
 physics based renderer
 bands of light
 cone tracing ?
-
+photon mapping
 orthogonal camera (meh?)
 
 triangles [done]
