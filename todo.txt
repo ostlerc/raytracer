@@ -1,8 +1,8 @@
 caustics [4] + [4]
 depth of field [2]
 motion blur [2]
-bvh + dragon [6]
-
+color bleeding [3]
+indirect lighting [4]
 
 
 color bleeding (tracing?)
@@ -43,8 +43,8 @@ camera move [done]
 threaded [done]
 anti-aliasing (sampling) [done, could be extracted into a class]
 dieletrics [done]
-bounding box optimizations [done]
+bounding box optimizations [done - top down and bottom up]
 perlin noise [done]
 stripes [done]
-import models [done, slow to preprocess though]
+import models [done]
 image to texture mapping [done]
