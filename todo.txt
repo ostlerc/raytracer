@@ -4,7 +4,6 @@ motion blur [2]
 color bleeding [3]
 indirect lighting [4]
 
-
 color bleeding (tracing?)
 bounding box optimizations
 some new scenes
