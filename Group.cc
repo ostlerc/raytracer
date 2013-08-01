@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-Group::Group()
+Group::Group(bool bottomUp) : _bottomUp(bottomUp)
 {
 }
 
@@ -59,6 +59,98 @@ void Group::preprocess(int maxTime)
 
 void Group::_populateBVH(int maxTime)
 {
+    if(_bottomUp)
+        _bottomUpBVH(maxTime);
+    else
+        _topDownBVH(maxTime);
+}
+
+void Group::_topDownBVH(int maxTime)
+{
+    RenderContext context(0, 0);
+
+    for(int time = 0; time <= maxTime; time++)
+    {
+        context.setTime(time);
+
+        _sortObjects(objects, context);
+        std::vector<Object*> _groups = _divideObjects(objects, context, maxTime);
+        if(_groups.size() > 2 || _groups.size() < 0)
+        {
+            cerr << "this is an error!!!" << endl;
+            exit(1);
+        }
+
+        //at this point _groups.count() can only be 1 or 2
+        groups[time] = _groups;
+    }
+}
+
+void Group::_sortObjects(std::vector<Object*>& objs, RenderContext& context)
+{
+    std::vector<BoundingBoxSorter> boxes;
+    for(auto o : objs)
+    {
+        BoundingBox bb;
+        o->getBounds(bb, context);
+        boxes.push_back(BoundingBoxSorter(bb, o));
+    }
+
+    sort(boxes.begin(), boxes.end());
+    objs.clear();
+
+    for(auto b : boxes)
+        objs.push_back(b.o);
+}
+
+std::vector<Object*> Group::_divideObjects(std::vector<Object*> objectsRemaining, RenderContext& context, int maxTime)
+{
+    std::vector<Object*> _groups;
+
+    //Top down bvh creation:
+    //sort elements and put half in one group and another in a different group
+
+    Group *grp = new Group(objectsRemaining.size() < 5000 || _bottomUp);
+    unsigned i;
+
+    {
+        for(i = 0; i < objectsRemaining.size() / 2; ++i)
+        {
+            if(!objectsRemaining[i])
+            {
+                cerr << "Null object found! at " << i << endl;
+                exit(1);
+            }
+
+            grp->addObject(objectsRemaining[i]);
+        }
+
+        grp->preprocess(maxTime);
+        _groups.push_back(grp);
+    }
+
+    grp = new Group(objectsRemaining.size() < 5000 || _bottomUp);
+
+    {
+        for( ; i < objectsRemaining.size(); ++i)
+        {
+            if(!objectsRemaining[i])
+            {
+                cerr << "Null object found! at " << i << endl;
+                exit(1);
+            }
+            grp->addObject(objectsRemaining[i]);
+        }
+
+        grp->preprocess(maxTime);
+        _groups.push_back(grp);
+    }
+
+    return _groups;
+}
+
+void Group::_bottomUpBVH(int maxTime)
+{
     RenderContext context(0, 0);
     for(int time = 0; time <= maxTime; time++)
     {
@@ -91,7 +183,7 @@ std::vector<Object*> Group::_pairObjects(std::vector<Object*> objectsRemaining, 
     while(objectsRemaining.size())
     {
         Object* at = objectsRemaining[0];
-        Group *pairs = new Group();
+        Group *pairs = new Group(_bottomUp);
 
         if(objectsRemaining.size() > 1)
         {

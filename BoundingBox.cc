@@ -95,3 +95,9 @@ double BoundingBox::distance(double p1, double p2)
 {
     return Abs(p1 - p2);
 }
+
+bool BoundingBox::operator <(const BoundingBox& other) const
+{
+    //sort on x, good enough for top down sorting
+    return min.x() < other.min.x();
+}

@@ -677,7 +677,7 @@ Material *Parser::parseMaterial()
 
 Object *Parser::parseGroupObject()
 {
-    Group *group = new Group();
+    Group *group = new Group(false);
     match( Token::left_brace, "Expected a left brace" );
     while ( !peek( Token::right_brace ) )
         group->addObject( parseObject() );
@@ -765,6 +765,7 @@ Object *Parser::parsePlyObject()
     std::string filename;
     Vector translate(0,0,0);
     Vector scale(1,1,1);
+    bool bottomUp = false;
 
     if ( peek( Token::left_brace ) )
     {
@@ -778,6 +779,8 @@ Object *Parser::parsePlyObject()
                 scale = parseVector();
             else if ( peek( "translate" ) )
                 translate = parseVector();
+            else if ( peek( "bottomUp" ) )
+                bottomUp = parseBoolean();
             else if ( peek( Token::right_brace ) )
                 break;
             else
@@ -790,7 +793,7 @@ Object *Parser::parsePlyObject()
 
     ply::plyFile file = ply::plyFile::parseFile(filename.c_str());
 
-    Group *g = new Group();
+    Group *g = new Group(bottomUp);
 
     std::vector<unsigned> faces = file.getElements();
 

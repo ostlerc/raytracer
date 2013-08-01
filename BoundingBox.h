@@ -27,6 +27,8 @@ class BoundingBox {
   double distance(BoundingBox& bb);
   double distance(double p1, double p2);
 
+  bool operator <(const BoundingBox& other) const;
+
  private:
   Point min, max;
 };
