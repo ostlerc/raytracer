@@ -512,7 +512,7 @@ Material *Parser::parseSpecularMaterial()
     }
 
     if(highlight.isEmpty())
-        highlight.addFrame(0, Color(1.0, 1.0, 1.0));
+        highlight.addFrame(0, Color(0, 0, 0));
     if(Kd.isEmpty())
         Kd.addFrame(0, 0.6);
     if(Ka.isEmpty())

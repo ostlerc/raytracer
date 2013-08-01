@@ -80,7 +80,7 @@ void SpecularMaterial::shade(Color& result, const RenderContext& context,
     if(depth < context.getScene()->getMaxRayDepth() && Kr(time) > 0.)
     {
         double reflet = 2. * Dot(ray.direction(), normal);
-        Vector rDir = ray.direction() + reflet * normal;
+        Vector rDir = ray.direction() - reflet * normal;
         rDir.normalize();
         Ray reflection(hitpos, rDir);
         Color rcolor;
