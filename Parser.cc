@@ -512,7 +512,7 @@ Material *Parser::parseSpecularMaterial()
     }
 
     if(highlight.isEmpty())
-        highlight.addFrame(0, Color(0, 0, 0));
+        highlight.addFrame(0, Color(1, 1, 1));
     if(Kd.isEmpty())
         Kd.addFrame(0, 0.6);
     if(Ka.isEmpty())
@@ -807,9 +807,9 @@ Object *Parser::parsePlyObject()
 
     for(unsigned i = 0; i < faces.size(); i+=3)
     {
-        p1 = (Point(file.vertex(faces[i])) + translate)*scale;
-        p2 = (Point(file.vertex(faces[i+1])) + translate)*scale;
-        p3 = (Point(file.vertex(faces[i+2])) + translate)*scale;
+        p1 = (Point(file.vertex(faces[i])) * scale)+translate;
+        p2 = (Point(file.vertex(faces[i+1])) * scale)+translate;
+        p3 = (Point(file.vertex(faces[i+2])) * scale)+translate;
 
         normal = file.normal(faces[i]);
 
