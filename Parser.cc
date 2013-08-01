@@ -1,13 +1,14 @@
 #include "Box.h"
 #include "CheckeredMaterial.h"
-#include "PerlinMaterial.h"
 #include "ConstantBackground.h"
 #include "Disc.h"
 #include "Group.h"
 #include "Image.h"
 #include "LambertianMaterial.h"
+#include "LambertianTextureMaterial.h"
 #include "MetalMaterial.h"
 #include "Parser.h"
+#include "PerlinMaterial.h"
 #include "PinholeCamera.h"
 #include "Plane.h"
 #include "PointLight.h"
@@ -16,6 +17,7 @@
 #include "Scene.h"
 #include "SpecularMaterial.h"
 #include "Sphere.h"
+#include "PolarSphere.h"
 #include "Triangle.h"
 #include "ply.h"
 
@@ -446,11 +448,15 @@ Material *Parser::parseLambertianMaterial()
   Color color( 1.0, 1.0, 1.0 );
   double Kd = 0.6;
   double Ka = 0.3;
+  string file;
+
   if ( peek( Token::left_brace ) )
     for ( ; ; )
     {
       if ( peek( "color" ) )
         color = parseColor();
+      else if ( peek( "file" ) )
+          file = parseString();
       else if ( peek( "Kd" ) )
         Kd = parseReal();
       else if ( peek( "Ka" ) )
@@ -458,9 +464,13 @@ Material *Parser::parseLambertianMaterial()
       else if ( peek( Token::right_brace ) )
         break;
       else
-        throwParseException( "Expected `color', `Kd', `Ka' or }." );
+        throwParseException( "Expected `color', `file', `Kd', `Ka' or }." );
     }
-  return new LambertianMaterial( color, Kd, Ka );
+
+  if(file.empty())
+      return new LambertianMaterial( color, Kd, Ka );
+  else
+      return new LambertianTextureMaterial( file, Kd, Ka );
 }
 
 Material *Parser::parseSpecularMaterial()
@@ -703,6 +713,8 @@ Object *Parser::parseSphereObject()
     int time = 0;
     Animation<Point> center;
     Animation<double> radius;
+    Animation<Vector> meridian;//(1,0,0);
+    Animation<Vector> pole;//(0,0,1);
 
     if ( peek( Token::left_brace ) )
     {
@@ -714,6 +726,18 @@ Object *Parser::parseSphereObject()
                 center.addFrame((double)time, parsePoint());
             else if ( peek( "radius" ) )
                 radius.addFrame((double)time, parseReal());
+            else if ( peek( "pole" ) )
+            {
+                Vector p = parseVector();
+                p.normalize();
+                pole.addFrame((double)time, p);
+            }
+            else if ( peek( "meridian" ) )
+            {
+                Vector m = parseVector();
+                m.normalize();
+                meridian.addFrame((double)time, m);
+            }
             else if ( peek( "time" ) )
             {
                 time = parseInteger();
@@ -722,14 +746,17 @@ Object *Parser::parseSphereObject()
             else if ( peek( Token::right_brace ) )
                 break;
             else
-                throwParseException( "Expected `material', `center', `radius', `time' or }." );
+                throwParseException( "Expected `material', `center', `radius', `pole', `meridian', `time' or }." );
         }
     }
 
     if(center.isEmpty() || radius.isEmpty())
         throwParseException( "Expected `material', `center', `radius' or }." );
 
-    return new Sphere( material, center, radius );
+    if(pole.isEmpty() || meridian.isEmpty())
+        return new Sphere( material, center, radius);
+    else
+        return new PolarSphere( material, center, radius, pole, meridian);
 }
 
 Object *Parser::parsePlyObject()
