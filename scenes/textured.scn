@@ -1,0 +1,86 @@
+// This is a test scene for Specter.  Try running "specter test.scn".
+
+xres 1820
+yres 1080
+filename "image.ppm"
+maxraydepth 10
+
+camera pinhole {
+  eye [ -44.0, -2.0, 5.2 ]
+  lookat [ 1.0, 1.0, 2.4 ]
+  up [ 0.0, 0.0, 1.0 ]
+  hfov 22.0
+}
+
+background constant {
+  color [ 0.1, 0.3, 0.5 ]
+}
+
+ambient [ 0.6, 0.6, 0.6 ]
+
+light point {
+  position [ -30.0, -20.0, 80.0 ]
+  color [ 0.7, 0.9, 0.9 ]
+}
+light point {
+  position [ -20.0, -50.0, 40.0 ]
+  color [ 0.53, 0.807, 0.98 ]
+}
+
+scene group {
+  sphere {
+    material lambertian {
+            file "world_map.ppm"
+            Kd 0.7
+            Ka 0.3
+        }
+    center [ 1.5, 3.5, 4.0 ]
+    radius 2.4
+    pole [ 0, 0, 1 ]
+    meridian [ 1, 0, 0 ]
+    time 10
+    meridian [ 0, 1, 0 ]
+    time 20
+    meridian [ -1, 0, 0 ]
+    time 30
+    meridian [ 0, -1, 0 ]
+    time 40
+    meridian [ 1, 0, 0 ]
+  }
+  sphere {
+    material metal {
+      color 0.7
+      exp 100
+    }
+    center [ -0.5, -1.5, 2.0 ]
+    radius 1.8
+  }
+  sphere {
+    material lambertian {
+            color [ 0.7, 0.0, 0.5 ]
+            Kd 0.5
+            Ka 0.1
+        }
+    center [ 0.5, 1.0, 1.0 ]
+    radius 1.0
+  }
+  sphere {
+    material lambertian {
+          color [ 0.7, 0.0, 0.5 ]
+          Kd 0.5
+          Ka 0.1
+        }
+
+    center [ 25.0, 25.0, 120.0 ]
+    radius 10.0
+  }
+  plane {
+    material lambertian {
+      color [ 0.4, 0.4, 0.7 ]
+      Kd 0.4
+      Ka 0.6
+    }
+    normal [ 0.0, 0.0, 1.0 ]
+    point [ 0.0, 0.0, -0.1 ]
+  }
+}
