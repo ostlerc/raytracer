@@ -1,10 +1,16 @@
-Week 4:
-I have added attenuation to the refractions
-fixed some bugs with box collisions
-added a BVH struture that speeds up things pretty well. one test I had was the low res bunny scene, this took 70 seconds without the BVH but only 6 seconds with it.
+Raytracer:
 
-Future things:
-  import ply files
-  others listen in todo.txt
+usage: ./specter <scene>
 
-  Time is running out, i'm hoping I can get a lot of the ideas done with the path tracing. But so far I havn't had time to make the leap for path tracing.
+sample scenes in the scenes directory.
+
+features:
+  planes, sphere, polarsphere, triangles, disc, ring and box primitives
+  lambertian, specular, dielectric, metal, perlin noise, textured materials
+  pinpoint camera, solid background, ply model parsing, ppm file reading and output
+  animation available for all primitives, materials and cameras.
+  BVH structure for high object count optimization.
+  good scene structure with define-able materials for easy re-use. There is no documentation right now on what the scene format is. I would use the examples and look at Parser.cc for help creating new scenes.
+
+missing:
+   path tracing, color bleeding , soft shadows, indirect lighting, motion blur, caustics, photon mapping
